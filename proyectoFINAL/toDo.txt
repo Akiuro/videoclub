@@ -1,0 +1,3 @@
+Registro y autenticación funcionales. Falta pulir/comprobar todos los campos.
+
+Comenzar con la inserción de películas (para facilitar el trabajo hacia la base de datos.)
