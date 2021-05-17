@@ -1,9 +1,9 @@
-﻿-- phpMyAdmin SQL Dump
+-- phpMyAdmin SQL Dump
 -- version 5.0.2
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 17-05-2021 a las 08:37:37
+-- Tiempo de generación: 17-05-2021 a las 11:56:47
 -- Versión del servidor: 10.4.14-MariaDB
 -- Versión de PHP: 7.4.10
 
@@ -76,7 +76,8 @@ CREATE TABLE `peliculas` (
 --
 
 INSERT INTO `peliculas` (`nom_pelicula`, `nom_original`, `genero_principal`, `genero_secundario`, `imagen`, `sinopsis`, `anio`, `pais`, `soporte`, `cantidad_disponible`, `id`) VALUES
-('Mortal Kombat', 'Mortal Kombat (2021)', 'Aventuras', 'Ciencia Ficción', 'assets\\images\\films\\mortal_kombat.png', 'En \"Mortal Kombat\", Cole Young, un luchador de MMA acostumbrado a recibir palizas a cambio de plata, no sabe lo que heredó, ni por qué el emperador Shang Tsung del Mundo Exterior mandó a Sub-Zero, su mejor guerrero, un criomante de otro mundo, a cazarlo. Cole teme por la seguridad de su familia, y sale en busca de Sonya Blade por indicación de Jax, un comandante de las Fuerzas Especiales que tiene la misma marca rara de nacimiento que Cole, con forma de dragón. Cole llega pronto al templo de Lord Raiden, un Dios Antiguo protector de la Tierra que ofrece refugio a quienes portan la marca. Allí, Cole entrena con los guerreros expertos Liu Kang, Kung Lao y Kano, el mercenario rebelde, y se prepara para unirse a los mayores campeones de la Tierra en el combate contra los enemigos del Mundo Exterior en una arriesgada batalla por el universo. Pero ¿sentirá la presión suficiente para desbloquear a tiempo su arcana (el inmenso poder que proviene de su alma) no solo para salvar a su familia, sino también para vencer al Mundo Exterior para siempre?\r\n', 2021, 'Estados Unidos', 'Fisico', 20, 0);
+('Mortal Kombat', 'Mortal Kombat (2021)', 'Aventuras', 'Ciencia Ficción', 'assets\\images\\films\\mortal_kombat.png', 'En \"Mortal Kombat\", Cole Young, un luchador de MMA acostumbrado a recibir palizas a cambio de plata, no sabe lo que heredó, ni por qué el emperador Shang Tsung del Mundo Exterior mandó a Sub-Zero, su mejor guerrero, un criomante de otro mundo, a cazarlo. Cole teme por la seguridad de su familia, y sale en busca de Sonya Blade por indicación de Jax, un comandante de las Fuerzas Especiales que tiene la misma marca rara de nacimiento que Cole, con forma de dragón. Cole llega pronto al templo de Lord Raiden, un Dios Antiguo protector de la Tierra que ofrece refugio a quienes portan la marca. Allí, Cole entrena con los guerreros expertos Liu Kang, Kung Lao y Kano, el mercenario rebelde, y se prepara para unirse a los mayores campeones de la Tierra en el combate contra los enemigos del Mundo Exterior en una arriesgada batalla por el universo. Pero ¿sentirá la presión suficiente para desbloquear a tiempo su arcana (el inmenso poder que proviene de su alma) no solo para salvar a su familia, sino también para vencer al Mundo Exterior para siempre?\r\n', 2021, 'Estados Unidos', 'Fisico', 20, 1),
+('Test', 'OriginalTest', 'Aventuras', 'Ciencia Ficción', 'ImagenTest', 'La sinopsis de esta pelicula es un test', 2020, 'Españita', 'Video', 45, 2);
 
 -- --------------------------------------------------------
 
@@ -105,6 +106,7 @@ CREATE TABLE `usuarios` (
   `email` varchar(2500) NOT NULL,
   `estado` tinyint(1) NOT NULL DEFAULT 1,
   `password` varchar(60) NOT NULL,
+  `tipo_usuario` varchar(20) NOT NULL,
   `id` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -112,13 +114,9 @@ CREATE TABLE `usuarios` (
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`nom_usuario`, `email`, `estado`, `password`, `id`) VALUES
-('paco', 'fiestas', 1, '$2y$10$8x48Skm.RgatFSR5qaDMN.0tUSph3gKPeN8lWiBfjzV9GWfDylOGi', 8),
-('Akiuro', 'adrianmendozasantano@gmail.com', 1, '$2y$10$.MSsc1R4fXsHERvj4e4fgOxR..XV8ksno18Mp5uJruIG73hOkAXAq', 9),
-('Akiurolol12', 'test', 1, '$2y$10$PR2UG7/iCVY.nDolDZL.3./wyAIC1YqVHDI.4k3Gm1y9JGMSCcGLm', 29),
-('Paquito', '123', 1, '$2y$10$YjcCVlh826DB.8QY9squPOM57f3jUXhgnfzT3FQyKo5Jiyun9HM/S', 31),
-('PaquitoSalas', 'emailtest', 1, '$2y$10$9uogkCFNYKneX.3aL/Dc0.Lv0BsAlHxBed78HnFX2W61u/rHgZabO', 32),
-('PaquitoSalas1', 'adson', 1, '$2y$10$0.zkH0oNNMwJjVxBfgR6EuZNzfx5cZ1zkZ/BUHy70bL6ZvdmUFDj.', 33);
+INSERT INTO `usuarios` (`nom_usuario`, `email`, `estado`, `password`, `tipo_usuario`, `id`) VALUES
+('Akiuro', 'adrianmendozasantano@gmail.com', 1, '$2y$10$.40gkP6z2076iucrPYnwJueVZnpkVoKzuSaL0L8l6jne5h7j2uTEy', 'administrador', 34),
+('Paco', 'Fiestas@gmail.com', 1, '$2y$10$rnTZiA3.H7Wkcb5UqdZIdeUMRQxhmqtM8awTiXLzT4owwkHaVEXui', 'normal', 35);
 
 -- --------------------------------------------------------
 
@@ -182,10 +180,16 @@ ALTER TABLE `ventas`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `peliculas`
+--
+ALTER TABLE `peliculas`
+  MODIFY `id` int(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- Restricciones para tablas volcadas
