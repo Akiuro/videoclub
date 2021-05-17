@@ -1,0 +1,5 @@
+Registro y autenticación funcionales. Falta pulir/comprobar todos los campos.
+
+Registro de peliculas funciona. Falta pulir MUCHO pero funcionalidad básica está.
+
+Implementar el navbar. Hacer que dependiendo del tipo de usuario identificado, aparezcan más o menos opciones.

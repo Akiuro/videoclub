@@ -1,12 +1,10 @@
 <?php
 
 session_start();
-if (isset($_POST['user'])) {
-    echo  "iniciado sesion. Hola, " . $_SESSION['datosUsuario']['username'];
-    echo "<script>console.log('Hay sesion');</script>";
-} else {
-    echo "<script>console.log('No hay sesion');</script>";
-}
+/* if (isset($_SESSION["datosUsuario"])) {
+    echo $_SESSION["datosUsuario"]["email"] . "<br>";
+    echo $_SESSION["datosUsuario"]["tipo"] . "<br>";
+} */
 
 ?>
 
@@ -32,23 +30,77 @@ if (isset($_POST['user'])) {
 </head>
 
 <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Videoclub</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <div id="social" class="row">
-        <div class="col-md-9">Videoclub</div>
-        <div class="col-md-3 row">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Inicio <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"></a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Explorar
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">Ver catálogo</a>
+                        <a class="dropdown-item" href="#">Mis préstamos</a>
 
-            <div class="col-md-6 botones">
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalInicSesion">
-                    Iniciar Sesión
-                </button>
-            </div>
-            <div class="col-md-6 botones">
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalRegistro">
-                    Registrate
-                </button>
-            </div>
+                    </div>
+                </li>
+                <?php if (isset($_SESSION["datosUsuario"]) && $_SESSION["datosUsuario"]["tipo"] == "administrador") {
+                ?>
+                    <li class="nav-item dropdown" id="navbarAdministrador">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Administrador
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="registroPeliculas.php">Insertar película</a>
+                            <a class="dropdown-item" href="#">Administrar préstamos</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Administrar usuarios</a>
+                        </div>
+                    </li>
+                <?php
+                }
+                ?>
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <?php
+                if (isset($_SESSION["datosUsuario"])) {
+                ?><ul class="navbar-nav mr-auto">
+                        <li class="nav-item dropdown ">
+                            <a class="nav-link btn-lg dropdown-toggle " href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <?php echo $_SESSION["datosUsuario"]["userId"]; ?>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" id="cerrarSesion" href="#">Cerrar sesión</a>
+                            </div>
+                        </li>
+                    </ul>
+                <?php
+
+                } else {
+
+                ?><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalInicSesion">
+                        Iniciar Sesión
+                    </button>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalRegistro">
+                        Registrate
+                    </button><?php
+                            }
+                                ?>
+
+            </form>
         </div>
-    </div>
+    </nav>
+
 
 
     <div class="modal fade" id="modalInicSesion" tabindex="-1" aria-hidden="true">
@@ -199,12 +251,15 @@ if (isset($_POST['user'])) {
             if (e == "Existe") {
                 $("#coincidencia").hide();
                 $('#modalInicSesion').modal('hide');
+                location.reload();
             }
             if (e == "No existe") {
                 $("#coincidencia").show();
+
             }
         });
         $("#formuInicSesion")[0].reset();
+
     });
     $("#formularioRegistro").on("submit", function(evento) {
         evento.preventDefault();
@@ -254,7 +309,12 @@ if (isset($_POST['user'])) {
 
         }
 
-    })
+    });
+    $("#cerrarSesion").on("click", function(e) {
+        e.preventDefault();
+        ajax("php/logout.php", "POST", "", function(e) {});
+        location.reload();
+    });
 </script>
 
 </html>
