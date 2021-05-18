@@ -88,6 +88,23 @@ function insertarPelicula($conexion)
     $sentencia->close();
 }
 
+function obtenerGeneros($conexion){
+
+//Obtenemos todos los géneros disponibles en la base de datos.
+$sentencia = $conexion->query("SELECT * FROM `generos`");
+$obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
+    echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
+
+
+}
+
+function obtenerPeliculas($conexion){
+    $sentencia = $conexion->query("SELECT * FROM `peliculas`");
+    $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
+        echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
+    
+
+}
 //Realizamos la conexión a la BDD, para poder pasarla por parámetro a las funciones.
 $conect = new Conexion("localhost", "root", "", "bd_videoclub");
 //Recogemos el valor pasado por parámetro. Según su valor, el switch usará una función u otra.
@@ -105,6 +122,12 @@ switch ($valor) {
         break;
     case 'insertarPelicula':
         insertarPelicula($conect->dbh);
+        break;
+        case 'obtenerGeneros':
+            obtenerGeneros($conect->dbh);
+        break;
+        case 'obtenerPeliculas':
+            obtenerPeliculas($conect->dbh);
         break;
     default:
 

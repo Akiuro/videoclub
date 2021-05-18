@@ -22,13 +22,13 @@
         <label for="nom_original">Nombre original</label>
         <input type="text" name="nom_original" id="nom_original">
         <label for="genero_princ">Género principal</label>
-        <input type="text" name="genero_princ" id="genero_princ">
+        <select name="genero_princ" id="genero_princ"></select>
         <label for="genero_secund">Género secundario</label>
-        <input type="text" name="genero_secund" id="genero_secund">
+        <select name="genero_secund" id="genero_secund"></select>
         <label for="imagen">Imagen</label>
         <input type="text" name="imagen" id="imagen">
         <label for="sinopsis">Sinopsis</label>
-        <input type="text" name="sinopsis" id="sinopsis">
+        <textarea name="sinopsis" id="sinopsis" cols="30" rows="10"></textarea>
         <label for="anio">Año</label>
         <input type="text" name="anio" id="anio">
         <label for="pais">País</label>
@@ -43,6 +43,25 @@
     <button action="index.php"><a href="index.php">Volver al index</a></button>
 </body>
 <script>
+
+    //Creamos elementos de forma dinámica al iniciar la página.
+
+    $(document).ready(function(e){
+        //Hacemos llamada a ajax y obtenemos todos los géneros existentes en la base de datos.
+        ajax("php/manejadorDB.php", "POST", {valor:"obtenerGeneros"}, function(e){
+  
+            let arrayGeneros = JSON.parse(e);
+         
+            //Creamos una cadena HTML para poder insertarla en el formulario.
+            let cadenaHTML = "";
+            for (let indice = 0; indice < arrayGeneros.length; indice++) {
+                    $("#genero_princ").append(`<option value="${arrayGeneros[indice].tipoGenero}">${arrayGeneros[indice].tipoGenero}</option>`);
+                    $("#genero_secund").append(`<option value="${arrayGeneros[indice].tipoGenero}">${arrayGeneros[indice].tipoGenero}</option>`);
+                           
+                }
+        });
+    });
+
     $("#registrarPelicula").on("submit", function(e) {
         e.preventDefault();
 
@@ -53,7 +72,9 @@
         datos.nom_original = $("#nom_original").val();
         datos.genero_princ = $("#genero_princ").val();
         datos.genero_secund = $("#genero_secund").val();
-        datos.imagen = $("#imagen").val();
+        let imagen = `assets/images/films/`;
+        imagen+= $("#imagen").val();
+        datos.imagen = imagen;
         datos.sinopsis = $("#sinopsis").val();
         datos.anio = $("#anio").val();
         datos.pais = $("#pais").val();
@@ -68,7 +89,7 @@
 
         //Limpiamos el formulario y avisamos al usuario de que la inserción ha sido realizada.
 
-        $("registrarPelicula")[0].reset();
+        $("#registrarPelicula")[0].reset();
         alert("Pelicula registrada.");
     });
 </script>
