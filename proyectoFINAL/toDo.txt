@@ -1,3 +1,5 @@
-Registro y autenticación funcionales. Falta pulir/comprobar todos los campos.
+Hacer pestaña de préstamos individual para cada usuario.
 
-Comenzar con la inserción de películas (para facilitar el trabajo hacia la base de datos.)
+Apartado en el lado izquierdo de últimas películas
+
+Apartado en el lado derecho de últimas reseñas

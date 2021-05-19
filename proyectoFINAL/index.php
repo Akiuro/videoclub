@@ -20,6 +20,30 @@ session_start();
         #social {
             margin-top: 1em;
         }
+
+        div#carouselExampleIndicators {
+            width: 100%;
+            border: 1px solid black;
+            margin: 0 auto;
+        }
+
+        .carousel-item {
+            width: 100%;
+            height: 700px;
+        }
+
+        .bg-secondary {
+            border-radius: 10px;
+            opacity: 0.7;
+        }
+
+        #izda {
+            border: 1px solid black;
+        }
+
+        #dcha {
+            border: 1px solid red;
+        }
     </style>
 
     <link rel="stylesheet" href="assets/css/login.css">
@@ -39,7 +63,7 @@ session_start();
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Inicio <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" id="inicio" href="#">Inicio</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#"></a>
@@ -49,8 +73,7 @@ session_start();
                         Explorar
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Ver catálogo</a>
-                        <a class="dropdown-item" href="#">Mis préstamos</a>
+                        <a class="dropdown-item" id="verCatalogo" href="#">Ver catálogo</a>
 
                     </div>
                 </li>
@@ -80,7 +103,9 @@ session_start();
                                 <?php echo $_SESSION["datosUsuario"]["userId"]; ?>
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" id="misPrestamos" href="#">Mis préstamos</a>
                                 <a class="dropdown-item" id="cerrarSesion" href="#">Cerrar sesión</a>
+                                <a class="dropdown-item" id="eliminarCuenta" href="#">Eliminar cuenta</a>
                             </div>
                         </li>
                     </ul>
@@ -100,6 +125,14 @@ session_start();
             </form>
         </div>
     </nav>
+    <div id="underNAV" class="row">
+        <div id="izda" class="col-2">Ultimas películas</div>
+        <div id="centro" class="col-8">
+            <div id="inicioSlider"><?php require_once "slider.php" ?></div>
+            <div id="catalogo">Esto es un test</div>
+        </div>
+        <div id="dcha" class="col-2"></div>
+    </div>
 
 
 
@@ -228,6 +261,7 @@ session_start();
 
     window.addEventListener("load", function(e) {
         $("#coincidencia").hide();
+        $("#catalogo").hide();
         $("#repetidos").hide();
     });
     window.addEventListener("unload", function(e) {
@@ -314,6 +348,14 @@ session_start();
         e.preventDefault();
         ajax("php/logout.php", "POST", "", function(e) {});
         location.reload();
+    });
+    $("#inicio").on("click", function(e) {
+        $("#inicioSlider").show();
+        $("#catalogo").hide();
+    });
+    $("#verCatalogo").on("click", function(e) {
+        $("#inicioSlider").hide();
+        $("#catalogo").show();
     });
 </script>
 
