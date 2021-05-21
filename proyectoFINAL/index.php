@@ -17,6 +17,10 @@ session_start();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
+        body {
+            background-color: black;
+        }
+
         #social {
             margin-top: 1em;
         }
@@ -43,6 +47,10 @@ session_start();
 
         #dcha {
             border: 1px solid red;
+        }
+
+        .card {
+            margin-top: 8% !important;
         }
     </style>
 
@@ -129,7 +137,7 @@ session_start();
         <div id="izda" class="col-2">Ultimas películas</div>
         <div id="centro" class="col-8">
             <div id="inicioSlider"><?php require_once "slider.php" ?></div>
-            <div id="catalogo">Esto es un test</div>
+            <div id="catalogo"><?php require_once "peliculas.php" ?></div>
         </div>
         <div id="dcha" class="col-2"></div>
     </div>
