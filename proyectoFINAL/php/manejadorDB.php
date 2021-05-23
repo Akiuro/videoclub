@@ -78,11 +78,12 @@ function insertarPelicula($conexion)
     $pais = $_REQUEST['pais'];
     $soporte = $_REQUEST['soporte'];
     $cantidad = $_REQUEST['cantidad'];
+    $precio = $_REQUEST['precio'];
 
     //Creamos la sentencia
 
-    $sentencia = $conexion->prepare("INSERT INTO `peliculas` (`nom_pelicula`, `nom_original`, `genero_principal`, `genero_secundario`, `imagen`, `sinopsis`, `anio`, `pais`, `soporte`, `cantidad_disponible`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $sentencia->bind_param('sssssssssi', $nom_peli, $nom_original, $genero_princ, $genero_secund, $imagen, $sinopsis, $anio, $pais, $soporte, $cantidad);
+    $sentencia = $conexion->prepare("INSERT INTO `peliculas` (`nom_pelicula`, `nom_original`, `genero_principal`, `genero_secundario`, `imagen`, `sinopsis`, `anio`, `pais`, `soporte`, `cantidad_disponible`, `precio`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $sentencia->bind_param('sssssssssis', $nom_peli, $nom_original, $genero_princ, $genero_secund, $imagen, $sinopsis, $anio, $pais, $soporte, $cantidad, $precio);
     $sentencia->execute();
     /* printf(" Error:% s. \ N ", $sentencia->error); */
     $sentencia->close();
@@ -105,10 +106,17 @@ function obtenerPeliculas($conexion){
     
 
 }
+function unaPelicula($conexion){
+    $id_peli = $_REQUEST['id'];
+    $sentencia = $conexion->query("SELECT * FROM `peliculas` WHERE id LIKE '$id_peli';");
+    $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
+        echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
+}
+
 //Realizamos la conexión a la BDD, para poder pasarla por parámetro a las funciones.
 $conect = new Conexion("localhost", "root", "", "bd_videoclub");
 //Recogemos el valor pasado por parámetro. Según su valor, el switch usará una función u otra.
-$valor = $_POST['valor'];
+$valor = $_REQUEST['valor'];
 
 switch ($valor) {
     case 'iniciarSesion':
@@ -129,6 +137,9 @@ switch ($valor) {
         case 'obtenerPeliculas':
             obtenerPeliculas($conect->dbh);
         break;
+        case 'unaPelicula':
+            unaPelicula($conect->dbh);
+            break;
     default:
 
         break;

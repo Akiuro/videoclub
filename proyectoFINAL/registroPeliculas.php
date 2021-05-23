@@ -37,6 +37,8 @@
         <input type="text" name="soporte" id="soporte">
         <label for="cantidad">Cantidad</label>
         <input type="text" name="cantidad" id="cantidad">
+        <label for="precio">Precio</label>
+        <input type="number" name="precio" id="precio">
 
         <input type="submit" value="Enviar">
     </form>
@@ -80,6 +82,7 @@
         datos.pais = $("#pais").val();
         datos.soporte = $("#soporte").val();
         datos.cantidad = $("#cantidad").val();
+        datos.precio = $("#precio").val();
         datos.valor = "insertarPelicula";
         //Llamamos a ajax e insertamos todos los datos en la base de datos.
 
