@@ -23,7 +23,8 @@ function iniciarSesion($conexion)
         $valores = [
             "userId" => $resultSentencia[0]["nom_usuario"],
             "email" =>  $resultSentencia[0]["email"],
-            "tipo" => $resultSentencia[0]["tipo_usuario"]
+            "tipo" => $resultSentencia[0]["tipo_usuario"],
+            "cartera" => $resultSentencia[0]["cartera"]
         ];
         $_SESSION['datosUsuario'] = $valores;
     } else {
@@ -41,7 +42,7 @@ function crearUsuario($conexion)
 
     //Añadimos los datos a las tablas usuario de la base de datos.
 
-    $sentencia = $conexion->prepare("INSERT INTO `usuarios` (`nom_usuario`, `email`, `estado`, `password`,`tipo_usuario`, `id`) VALUES (?,?,1,?,'normal', NULL);");
+    $sentencia = $conexion->prepare("INSERT INTO `usuarios` (`nom_usuario`, `email`, `estado`, `password`,`tipo_usuario`, `cartera`,  `id`) VALUES (?,?,1,?,'normal',00.00,  NULL);");
     $sentencia->bind_param('sss', $nuevoUsuario, $nuevoEmail, $nuevaPassword);
     $sentencia->execute();
     $sentencia->close();
@@ -89,28 +90,39 @@ function insertarPelicula($conexion)
     $sentencia->close();
 }
 
-function obtenerGeneros($conexion){
+function obtenerGeneros($conexion)
+{
 
-//Obtenemos todos los géneros disponibles en la base de datos.
-$sentencia = $conexion->query("SELECT * FROM `generos`");
-$obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
+    //Obtenemos todos los géneros disponibles en la base de datos.
+    $sentencia = $conexion->query("SELECT * FROM `generos`");
+    $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
     echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
-
-
 }
 
-function obtenerPeliculas($conexion){
+function obtenerPeliculas($conexion)
+{
     $sentencia = $conexion->query("SELECT * FROM `peliculas`");
     $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
-        echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
-    
-
+    echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
 }
-function unaPelicula($conexion){
+function unaPelicula($conexion)
+{
     $id_peli = $_REQUEST['id'];
     $sentencia = $conexion->query("SELECT * FROM `peliculas` WHERE id LIKE '$id_peli';");
     $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
-        echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
+    echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
+}
+function mostrarVentas($conexion)
+{
+    $usuario = $_REQUEST['usuario'];
+    $sentencia = $conexion->query("SELECT * FROM `prestamos` WHERE cliente LIKE '$usuario';");
+    $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
+    echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
+}
+function devolverPelicula($conexion)
+{
+    $id = $_REQUEST['id_prestamo'];
+    $conexion->query("UPDATE `prestamos` SET `devuelto` = 'Si' WHERE `prestamos`.`id_prestamo` = $id;");
 }
 
 //Realizamos la conexión a la BDD, para poder pasarla por parámetro a las funciones.
@@ -131,15 +143,21 @@ switch ($valor) {
     case 'insertarPelicula':
         insertarPelicula($conect->dbh);
         break;
-        case 'obtenerGeneros':
-            obtenerGeneros($conect->dbh);
+    case 'obtenerGeneros':
+        obtenerGeneros($conect->dbh);
         break;
-        case 'obtenerPeliculas':
-            obtenerPeliculas($conect->dbh);
+    case 'obtenerPeliculas':
+        obtenerPeliculas($conect->dbh);
         break;
-        case 'unaPelicula':
-            unaPelicula($conect->dbh);
-            break;
+    case 'unaPelicula':
+        unaPelicula($conect->dbh);
+        break;
+    case 'mostrarVentas':
+        mostrarVentas($conect->dbh);
+        break;
+    case 'devolver':
+        devolverPelicula($conect->dbh);
+        break;
     default:
 
         break;

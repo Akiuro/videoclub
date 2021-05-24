@@ -1,11 +1,5 @@
 <?php
-
 session_start();
-/* if (isset($_SESSION["datosUsuario"])) {
-    echo $_SESSION["datosUsuario"]["email"] . "<br>";
-    echo $_SESSION["datosUsuario"]["tipo"] . "<br>";
-} */
-
 ?>
 
 <!DOCTYPE html>
@@ -17,49 +11,14 @@ session_start();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        body {
-            background-color: black;
-        }
-
-        #social {
-            margin-top: 1em;
-        }
-
-        div#carouselExampleIndicators {
-            width: 100%;
-            border: 1px solid black;
-            margin: 0 auto;
-        }
-
-        .carousel-item {
-            width: 100%;
-            height: 700px;
-        }
-
-        .bg-secondary {
-            border-radius: 10px;
-            opacity: 0.7;
-        }
-
-        #izda {
-            border: 1px solid black;
-        }
-
-        #dcha {
-            border: 1px solid red;
-        }
-
-        .card {
-            margin-top: 8% !important;
-        }
     </style>
-
-    <link rel="stylesheet" href="assets/css/login.css">
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <script src="assets/js/ajax.js"></script>
-    <script src="assets/js/jquery-3.4.1.min.js"></script>
-    <script src="assets/js/bootstrap.min.js"></script>
 </head>
+
+<link rel="stylesheet" href="assets/css/login.css">
+<link rel="stylesheet" href="assets/css/bootstrap.min.css">
+<script src="assets/js/ajax.js"></script>
+<script src="assets/js/jquery-3.4.1.min.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -138,15 +97,31 @@ session_start();
         } ?>
 
     </nav>
-    <div id="underNAV" class="row">
-        <div id="izda" class="col-2">Ultimas películas</div>
-        <div id="centro" class="col-8">
-            <div id="inicioSlider"><?php require_once "slider.php" ?></div>
-            <div id="catalogo"><?php require_once "peliculas.php" ?></div>
-        </div>
-        <div id="dcha" class="col-2"></div>
-    </div>
 
+    <div id="contenedor" class="row">
+        <div class="col-1"></div>
+        <div id="tablas" class="col-10 row">
+            <div id="saludar" class="col">
+                <h2>Hola, <?php echo $_SESSION["datosUsuario"]["userId"]; ?>. Aquí están todas tus acciones.</h2>
+            </div>
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Pelicula</th>
+                        <th scope="col">Compra/Alquiler</th>
+                        <th scope="col">Precio</th>
+                        <th scope="col">Fecha de compra</th>
+                        <th scope="col">Fecha fin</th>
+                        <th scope="col">Devolver</th>
+                    </tr>
+                </thead>
+                <tbody id="comprasPeliculas">
+
+                </tbody>
+            </table>
+        </div>
+        <div class="col-1"></div>
+    </div>
 
 
     <div class="modal fade" id="modalInicSesion" tabindex="-1" aria-hidden="true">
@@ -262,13 +237,7 @@ session_start();
             </div>
         </div>
     </div>
-
-
 </body>
-
-
-
-
 <script>
     //Escondemos el formulario de primeras
 
@@ -276,6 +245,54 @@ session_start();
         $("#coincidencia").hide();
         $("#catalogo").hide();
         $("#repetidos").hide();
+
+        //Cuando se cargue esta página, se obtiene tu nombre de usuario. Se mostrarán absolutamente todos los alquileres a tu nombre.
+        let nombreUsuario = "<?php echo $_SESSION["datosUsuario"]["userId"]; ?>";
+
+        //Hacemos llamada a ajax y obtenemos todos los préstamos/compras a nombre del usuario.
+        let datosPasar = new Object;
+        datosPasar.valor = "mostrarVentas";
+        datosPasar.usuario = nombreUsuario;
+        ajax("php/manejadorDB.php", "POST", datosPasar, function(e) {
+            let ventas = JSON.parse(e);
+            if (ventas.length == 0) {
+                $("#comprasPeliculas").append(`
+                       <h1>No has realizado ni compras ni alquileres con esta cuenta.</h1>`);
+            } else {
+                let fecha_fin = "";
+                let disabled = "";
+                let devolver = "Devolver";
+                ventas.forEach((elemento, indice) => {
+                    //Este if comprueba si es una compra o un alquiler. Dependiendo del caso, mostrará fecha o no.
+                    if (elemento.tipo == "compra") {
+                        fecha_fin = "No hay fecha límite";
+                    } else {
+                        fecha_fin = elemento.fecha_fin;
+                    }
+                    //Este if comprobará si el elemento ya está devuelto. Si lo está, deshabilitará el botón.
+                    if (elemento.devuelto == "Si") {
+                        disabled = "disabled='disabled'";
+                        devolver = "Devuelto";
+                    } else {
+                        disabled = "";
+                        devolver = "Devolver";
+                    }
+                    $("#comprasPeliculas").append(`
+                        <tr>
+                            <th scope="row">${elemento.nombre_pelicula}</th>
+                            <td>${elemento.tipo}</td>
+                            <td>${elemento.precio}€</td>
+                            <td>${elemento.fecha_inicio}</td>
+                            <td>${fecha_fin}</td>
+                            <td><button data-devolver="${elemento.id_prestamo}" ${disabled} class="btn btn-dark">${devolver}</button></td>
+                        </tr>`);
+                });
+            }
+
+        });
+
+
+
     });
     window.addEventListener("unload", function(e) {
 
@@ -360,16 +377,26 @@ session_start();
     $("#cerrarSesion").on("click", function(e) {
         e.preventDefault();
         ajax("php/logout.php", "POST", "", function(e) {});
-        location.reload();
+        location.href = "index.php";
     });
-    $("#inicio").on("click", function(e) {
-        $("#inicioSlider").show();
-        $("#catalogo").hide();
-    });
-    $("#verCatalogo").on("click", function(e) {
-        $("#inicioSlider").hide();
-        $("#catalogo").show();
+
+    //Para cuando se haga click en devolver, controlamos dónde se ha hecho click, y actualizamos.
+    $("#comprasPeliculas").on("click", function(e) {
+        $target = $(e.target);
+        if ($target.data('devolver') != undefined) {
+
+            let datosDevolucion = new Object;
+            datosDevolucion.valor = "devolver";
+            datosDevolucion.id_prestamo = $target.data('devolver');
+            //Hacemos la devolución por ajax.
+            ajax("php/manejadorDB.php", "POST", datosDevolucion, function(e) {
+                //Deshabilitamos el botón para que no pueda devolverse algo de nuevo.
+                $target.attr('disabled', 'disabled');
+                $target.html("Devuelto");
+            });
+        }
     });
 </script>
+
 
 </html>
