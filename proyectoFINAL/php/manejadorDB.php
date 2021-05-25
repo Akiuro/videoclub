@@ -48,6 +48,15 @@ function crearUsuario($conexion)
     $sentencia->close();
 }
 
+function eliminarUsuario($conexion){
+    $usuarioEliminado = $_POST['usuario'];
+    $sentencia = $conexion->prepare("DELETE FROM `usuarios` WHERE `usuarios`.`nom_usuario` = ?;");
+    $sentencia->bind_param('s', $usuarioEliminado);
+    $sentencia->execute();
+    $sentencia->close();
+    
+}
+
 function comprobarRepetido($conexion)
 {
     $user = $_POST['user'];
@@ -107,8 +116,8 @@ function obtenerPeliculas($conexion)
 }
 function unaPelicula($conexion)
 {
-    $id_peli = $_REQUEST['id'];
-    $sentencia = $conexion->query("SELECT * FROM `peliculas` WHERE id LIKE '$id_peli';");
+    $nombre_peli = $_REQUEST['id'];
+    $sentencia = $conexion->query("SELECT * FROM `peliculas` WHERE nom_pelicula LIKE '$nombre_peli';");
     $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
     echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
 }
@@ -123,8 +132,59 @@ function devolverPelicula($conexion)
 {
     $id = $_REQUEST['id_prestamo'];
     $conexion->query("UPDATE `prestamos` SET `devuelto` = 'Si' WHERE `prestamos`.`id_prestamo` = $id;");
+    //Obtenemos el nombre de la pelicula
+    $sentencia = $conexion->query("SELECT pe.`cantidad_disponible`, pe.`nom_pelicula` FROM `peliculas` AS pe INNER JOIN prestamos AS pr ON pe.nom_pelicula = pr.nombre_pelicula WHERE `pr`.`id_prestamo` = $id;");
+    $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
+    
+    $cantidadPelicula = $obtenido[0]["cantidad_disponible"];
+    $nombrePelicula = $obtenido[0]["nom_pelicula"];
+    $nuevaCantidad = $cantidadPelicula+1;
+    echo $nuevaCantidad;
+   //REVISAR ESTA ULTIMA LINEA DE CODIGO
+    $conexion->query("UPDATE `peliculas` SET `cantidad_disponible` = '$nuevaCantidad' WHERE `nom_pelicula` = '$nombrePelicula';");
 }
 
+function insertarVenta($conexion)
+{   
+    $usuario=$_SESSION["datosUsuario"]["userId"]; 
+    $nombre = $_POST['nom_pelicula'];
+    $tipo = $_POST['tipo'];
+    $precio = $_POST['precio'];
+    $fecha_actual = date("Y-m-d");
+    $fecha_final = strtotime("+7 day");
+    $fecha_fin = date("Y-m-d", $fecha_final);
+    //Obtenemos el dinero de la cartera del usuario.
+    $sentencia = $conexion->query("SELECT `cartera` FROM `usuarios` WHERE `usuarios`.`nom_usuario` LIKE '$usuario';");
+    $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
+    $old_cartera = $obtenido[0]["cartera"];
+    $new_cartera= $old_cartera - $precio;
+    //Comprobamos si tiene saldo suficiente. Si lo tiene, ejecutará la venta y restará el sueldo, si no, arrojará un aviso al usuario.
+    if($new_cartera>=0){
+        //Restamos al usuario el dinero de su cartera.
+    $conexion->query("UPDATE `usuarios` SET `cartera` = '$new_cartera' WHERE `usuarios`.`nom_usuario` ='$usuario';");
+    $_SESSION["datosUsuario"]["cartera"]=$new_cartera;
+    $conexion->query("INSERT INTO `prestamos` (`nombre_pelicula`, `cliente`, `tipo`, `fecha_inicio`, `fecha_fin`, `precio`, `devuelto`, `id_prestamo`) VALUES ('$nombre', '$usuario', '$tipo', '$fecha_actual', '$fecha_fin', '$precio', 'No', NULL);");
+    //A continuación, reducimos en 1 el stock de la tienda.
+    $conexion->query("UPDATE `peliculas` SET `cantidad_disponible` = `cantidad_disponible`-1 WHERE `peliculas`.`nom_pelicula` ='$nombre';");
+    }
+    else{
+        echo "No hay dinero";
+    }
+}
+
+function ingresarDinero($conexion){
+    $ingreso = $_POST['ingreso'];
+    $usuario=$_SESSION["datosUsuario"]["userId"];
+
+    $sentencia = $conexion->query("SELECT `cartera` FROM `usuarios` WHERE `usuarios`.`nom_usuario` LIKE '$usuario';");
+    $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
+    $old_cartera = $obtenido[0]["cartera"];
+    $new_cartera= $old_cartera + $ingreso;
+    
+    $conexion->query("UPDATE `usuarios` SET `cartera` = '$new_cartera' WHERE `usuarios`.`nom_usuario` = '$usuario';");
+    $_SESSION["datosUsuario"]["cartera"]=$new_cartera;
+
+}
 //Realizamos la conexión a la BDD, para poder pasarla por parámetro a las funciones.
 $conect = new Conexion("localhost", "root", "", "bd_videoclub");
 //Recogemos el valor pasado por parámetro. Según su valor, el switch usará una función u otra.
@@ -136,6 +196,9 @@ switch ($valor) {
         break;
     case 'registroUsuario':
         crearUsuario($conect->dbh);
+        break;
+        case 'eliminarUsuario':
+            eliminarUsuario($conect->dbh);
         break;
     case 'comprobarRepetido':
         comprobarRepetido($conect->dbh);
@@ -157,6 +220,12 @@ switch ($valor) {
         break;
     case 'devolver':
         devolverPelicula($conect->dbh);
+        break;
+    case 'vender':
+        insertarVenta($conect->dbh);
+        break;
+    case 'ingresarDinero':
+        ingresarDinero($conect->dbh);
         break;
     default:
 

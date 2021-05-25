@@ -93,9 +93,9 @@ session_start();
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="registroPeliculas.php">Insertar película</a>
-                            <a class="dropdown-item" href="#">Administrar préstamos</a>
+                            <a class="dropdown-item" href="#">Administrar préstamos[WIP]</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Administrar usuarios</a>
+                            <a class="dropdown-item" href="#">Administrar usuarios[WIP]</a>
                         </div>
                     </li>
                 <?php
@@ -111,10 +111,10 @@ session_start();
                                 <?php echo $_SESSION["datosUsuario"]["userId"]; ?>
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" id="misPrestamos" href="#">Añadir fondos</a>
+                                <a class="dropdown-item" id="aniadirFondos" href="" data-target="#modalRegistro">Añadir fondos</a>
                                 <a class="dropdown-item" id="misPrestamos" href="verCompras.php">Mis préstamos</a>
-                                <a class="dropdown-item" id="cerrarSesion" href="#">Cerrar sesión</a>
-                                <a class="dropdown-item" id="eliminarCuenta" href="#">Eliminar cuenta</a>
+                                <a class="dropdown-item" id="cerrarSesion" href="">Cerrar sesión</a>
+                                <a class="dropdown-item" id="eliminarCuenta" href="">Eliminar cuenta</a>
                             </div>
                         </li>
                     </ul>
@@ -133,9 +133,10 @@ session_start();
 
             </form>
         </div>
-        <?php if (isset($_SESSION["datosUsuario"])) {
+        <div id="saldo_navbar"><?php if (isset($_SESSION["datosUsuario"])) {
             echo '<div id="saldo" class="nav-link">Tu saldo: ' . $_SESSION["datosUsuario"]["cartera"] . '€</div>';
-        } ?>
+        } ?></div>
+        
 
     </nav>
     <div id="underNAV" class="row">
@@ -180,7 +181,7 @@ session_start();
                                                     <input name="login" id="login" class="btn btn-block login-btn mb-4" type="submit" value="Inicia sesión">
                                                 </form>
                                                 <a href="#!" class="forgot-password-link">¿Has olvidado tu contraseña?</a>
-                                                <p class="login-card-footer-text">¿No tienes cuenta? <a href="nuevoUsuario.php" class="text-reset">Registrate aquí</a></p>
+                                                <p class="login-card-footer-text">¿No tienes cuenta? <a href="" id="inicioToRegistro" class="text-reset">Registrate aquí</a></p>
                                                 <div id="coincidencia" class="alert alert-warning" role="alert">
                                                     El usuario y la contraseña no coinciden. Por favor, inténtalo de nuevo.
                                                 </div>
@@ -263,7 +264,50 @@ session_start();
         </div>
     </div>
 
+<!-- Modal -->
+<div
+  class="modal fade" id="modalSaldo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Insertar saldo en tu cuenta</h5>
+        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      <p class="login-card-description">Hola <?php echo $_SESSION["datosUsuario"]["userId"] ?>. Por favor, indica cuanto saldo quieres añadir a tu cuenta (en €).</p>
+      <input type="number" name="saldoInsertar" id="saldoInsertar" class="form-control" placeholder="Ej: 14.95"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Esta vez no.
+        </button>
+        <button type="button" class="btn btn-primary" id="insertarSaldo">Insertar saldo</button>
+      </div>
+    </div>
+  </div>
+</div>
 
+
+<div
+  class="modal fade" id="modalEliminarCuenta" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">¿Eliminar cuenta?</h5>
+        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      <p class="control-label"><?php echo $_SESSION["datosUsuario"]["userId"] ?>, ¿estás seguro de querer eliminar tu cuenta?.</p>
+      <p class="control-label">Esta acción es permanente e irreversible, y perderás todo lo asociado a tu cuenta. ¿Estás seguro? Si es así, escribe "Eliminar"</p>
+      <input type="text" name="escribeEliminar" id="escribeEliminar" class="form-control" placeholder='Escribe: Eliminar'></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" id="noEliminarCuenta" data-bs-dismiss="modal">
+          No quiero borrar mi cuenta.
+        </button>
+        <button type="button" class="btn btn-danger popover-test" id="eliminarCuentaPermanente" data-bs-content="No has escrito Eliminar correctamente. Revísalo." >Sí, eliminar cuenta permanentemente.</button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 
 
@@ -362,6 +406,11 @@ session_start();
         ajax("php/logout.php", "POST", "", function(e) {});
         location.reload();
     });
+
+    $("#inicioToRegistro").on("click", function(e){
+        $('#modalInicSesion').modal('hide');   
+    });
+
     $("#inicio").on("click", function(e) {
         $("#inicioSlider").show();
         $("#catalogo").hide();
@@ -369,6 +418,54 @@ session_start();
     $("#verCatalogo").on("click", function(e) {
         $("#inicioSlider").hide();
         $("#catalogo").show();
+    });
+    $("#aniadirFondos").on("click", function(e){
+        e.preventDefault();
+        $("#modalSaldo").modal();
+    });
+    $("#insertarSaldo").on("click", function(e){
+        if($("#saldoInsertar").val()==""){
+            console.log("llenalo puto!");
+        }
+        else if($("#saldoInsertar").val().slice(0, 1)=="-"){
+            console.log("negativos no puto!");
+        }
+        else{
+            let insertarSaldo= new Object;
+            insertarSaldo.valor="ingresarDinero";
+            insertarSaldo.ingreso=$("#saldoInsertar").val();
+            ajax("php/manejadorDB.php", "POST", insertarSaldo, function(e){
+            });
+            location.reload();
+        }
+    });
+    $("#eliminarCuenta").on("click", function(e){
+        e.preventDefault();
+        $('#modalEliminarCuenta').modal();
+    });
+    $("#noEliminarCuenta").on("click", function(e){
+        e.preventDefault();
+        $('#modalEliminarCuenta').modal('hide');
+    });
+    $("#eliminarCuentaPermanente").on("click", function(e){
+        if($("#escribeEliminar").val()=="Eliminar"){
+            e.preventDefault();
+            <?php if(isset($_SESSION["datosUsuario"]["userId"])) { ?>
+            let borrarCuenta = new Object();
+            borrarCuenta.valor="eliminarUsuario";
+            borrarCuenta.usuario="<?php echo $_SESSION["datosUsuario"]["userId"] ?>";
+            ajax("php/manejadorDB.php", "POST", borrarCuenta, function(e){
+
+            });
+
+            ajax("php/logout.php", "POST", {}, function(e){
+                location.reload();
+            });
+        <?php } ?> 
+        } 
+        else{
+
+        }
     });
 </script>
 
