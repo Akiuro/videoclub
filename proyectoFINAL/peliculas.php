@@ -4,6 +4,13 @@
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
+
+<div id="masAlquiler" class="alert alert-danger alert-dismissible fade show" role="alert">
+  <strong>¡Holy guacamoly!</strong> Ya tienes una película en alquiler. Por favor, cumple tu plazo o devuelve la anterior para alquilar una nueva.
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
 <div id="noDinero" class="alert alert-warning alert-dismissible fade show" role="alert">
   <strong>¡Holy guacamoly!</strong> ¡No hay dinero suficiente, añade algo más!
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -18,11 +25,11 @@
 </div>
 <form class="bd-search position-relative me-auto">
     <span class="algolia-autocomplete" style="position: relative; display: inline-block; direction: ltr;">
-        <input type="search" class="form-control ds-input" id="busquedaPelis" placeholder="Buscar peliculas..." aria-label="Byscar peliculas..." autocomplete="off" data-bd-docs-version="5.0" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-owns="algolia-autocomplete-listbox-0" dir="auto" style="position: relative; vertical-align: top;">
+        <input type="search" class="form-control ds-input" id="busquedaPelis" placeholder="Buscar peliculas..." aria-label="Buscar peliculas..." autocomplete="off" data-bd-docs-version="5.0" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-owns="algolia-autocomplete-listbox-0" dir="auto" style="position: relative; vertical-align: top;">
     </span>
     </span>
 </form>
-<div id="contenedorCartas" class="row row-cols-1 row-cols-md-3 g-4">
+<div id="contenedorCartas" class="row row-cols-1 row-cols-md-4 g-4">
 </div>
 
 </body>
@@ -33,6 +40,7 @@
         $("#noDinero").hide();
         $("#siDinero").hide();
         $("#noStock").hide();
+        $("#masAlquiler").hide();
         //Llamamos a Ajax, y obtenemos toda la información de las películas.
 
         ajax("php/manejadorDB.php", "POST", {
@@ -59,7 +67,7 @@
                 insertarCartas(misPeliculas);
             } else {
                 //Filtramos la busqueda por lo que haya en la barra de navegación, creando de forma dinámica los elementos.
-                for (let indice = 0; indice < misPeliculas.length; indice++) {
+                for (let indice = 0; indice < misPeliculas.length; indice++ && $("#contenedorCartas").html()=="") {
                     if (misPeliculas[indice].nom_pelicula.search(miBusqueda) != -1) {
                         insertarCartaIndividual(misPeliculas, miBusqueda);
                     } else {
@@ -78,27 +86,47 @@
             //Comprobamos si el usuario ha iniciado sesión. Si no lo ha hecho, se le indicará que debe hacerlo para poder comprar/alquilar.
             <?php if (isset($_SESSION["datosUsuario"])){ ?>
 
-               
-
-               
                 let comprar_alquilar="";
-
+                let noAlquila = false;
                 if($target.data('comprar') != undefined){
-                    comprar_alquilar="compra"
+                    comprar_alquilar="compra";
                 }
                 if($target.data('alquilar') != undefined){
-                    comprar_alquilar="alquiler";
-                }
+                    comprar_alquilar="alquiler"
+                    
+                    //Hemos de comprobar si el usuario tiene una película alquilada. Si es así, no podrá alquilar nada.
+                    let comprobarAlquileres = new Object();
+                    comprobarAlquileres.valor = "mostrarVentas";
+                    comprobarAlquileres.usuario = "<?php echo $_SESSION["datosUsuario"]["userId"] ?>";
+                    ajax("php/manejadorDB.php", "POST", comprobarAlquileres, function(e){
+                        let arrayAlquileres = JSON.parse(e);
 
+                        for (let indice = 0; indice < arrayAlquileres.length; indice++) {
+                               if(arrayAlquileres[indice].devuelto=="No" && arrayAlquileres[indice].tipo=="alquiler"){
+
+                                noAlquila = true;
+                               }   
+                               else{
+                                
+                               }
+                        }
+                        //Comprobamos si se dio el caso.
+                        /* if(noAlquila==true){
+                                console.log("Definitivamente no alquila");
+                                }
+                                else{
+                                console.log("Definitivamente alquila");
+                                } */
+
+                    });                  
+                }
+                console.log(noAlquila);
                 let peliculaAccion = new Object();
                 peliculaAccion.valor = "unaPelicula";
                 peliculaAccion.id = $target.data('id');
 
-                
-                
                 ajax("php/manejadorDB.php", "POST", peliculaAccion, function(e) {
                     let peliculaObtenida = JSON.parse(e);
-                    console.log(peliculaObtenida);
 
                      //Una vez comprobado, comprobamos si hay stock de la pelicula en cuestión. Si la hay, se ejecutará la acción, si no, se avisará al usuario.
                      $stockDisponible = peliculaObtenida[0].cantidad_disponible;
@@ -109,7 +137,6 @@
                         miVenta.nom_pelicula=peliculaObtenida[0].nom_pelicula;
                         miVenta.tipo=comprar_alquilar;
                         miVenta.precio=peliculaObtenida[0].precio;
-                        console.log(miVenta);
                         ajax("php/manejadorDB.php", "POST", miVenta, function(e){
                             if(e=="No hay dinero"){
                                 $("#noDinero").fadeIn("slow");
@@ -145,11 +172,11 @@
     function insertarCartas(misPeliculas) {
         for (let indice = 0; indice < misPeliculas.length; indice++) {
             $("#contenedorCartas").append(`<div class="col">
-                        <div class="card">
+                        <div class="card" id="${misPeliculas[indice].nom_pelicula}">
                             <img src="${misPeliculas[indice].imagen}" class="card-img-top" alt="${misPeliculas[indice].nom_pelicula}">
                             <div class="card-body">
                                 <h5 class="card-title">${misPeliculas[indice].nom_pelicula}</h5>
-                                <p class="card-text">Géneros: ${misPeliculas[indice].genero_principal}, ${misPeliculas[indice].genero_secundario}</p>
+                                <p class="card-text">Géneros: ${misPeliculas[indice].genero_principal}, ${misPeliculas[indice].genero_secundario}. Año: ${misPeliculas[indice].anio}</p>
                                 <p class="card-text">${misPeliculas[indice].sinopsis.substring(0, 180).concat('...')}</p>
                                 <p class="card-text">Precio: ${misPeliculas[indice].precio}€</p>
                                 <a href="#" class="btn btn-primary" data-id="${misPeliculas[indice].nom_pelicula}" data-comprar="yes">Comprar película</a>
@@ -161,14 +188,16 @@
     }
 
     function insertarCartaIndividual(misPeliculas, miBusqueda) {
+        console.log(misPeliculas);
         misPeliculas.forEach((elemento, indice) => {
-            if (elemento.nom_pelicula.search(miBusqueda) != -1) {
+            
+            if (/* $("#contenedorCartas").find(`#${elemento.nom_pelicula}`) &&  */elemento.nom_pelicula.search(miBusqueda) != -1 || elemento.precio.search(miBusqueda) != -1) {
                 $("#contenedorCartas").append(`<div class="col">
-                        <div class="card">
+                        <div class="card" id="${elemento.nom_pelicula}">
                             <img src="${elemento.imagen}" class="card-img-top" alt="${elemento.nom_pelicula}">
                             <div class="card-body">
                                 <h5 class="card-title">${elemento.nom_pelicula}</h5>
-                                <p class="card-text">Géneros: ${elemento.genero_principal}, ${elemento.genero_secundario}</p>
+                                <p class="card-text">Géneros: ${elemento.genero_principal}, ${elemento.genero_secundario}. Año: ${elemento.anio}</p>
                                 <p class="card-text">${elemento.sinopsis.substring(0, 180).concat('...')}</p>
                                 <p class="card-text">Precio: ${misPeliculas[indice].precio}€</p>
                                 <a href="#" class="btn btn-primary" data-id="${elemento.nom_pelicula}" data-comprar="yes">Comprar película</a>

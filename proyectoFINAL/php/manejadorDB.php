@@ -101,7 +101,6 @@ function insertarPelicula($conexion)
 
 function obtenerGeneros($conexion)
 {
-
     //Obtenemos todos los géneros disponibles en la base de datos.
     $sentencia = $conexion->query("SELECT * FROM `generos`");
     $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
@@ -128,6 +127,7 @@ function mostrarVentas($conexion)
     $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
     echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
 }
+
 function devolverPelicula($conexion)
 {
     $id = $_REQUEST['id_prestamo'];

@@ -77,10 +77,10 @@ session_start();
                     <a class="nav-link" href="#"></a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownExplorar" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Explorar
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownExplorar">
                         <a class="dropdown-item" id="verCatalogo" href="#">Ver catálogo</a>
 
                     </div>
@@ -88,10 +88,10 @@ session_start();
                 <?php if (isset($_SESSION["datosUsuario"]) && $_SESSION["datosUsuario"]["tipo"] == "administrador") {
                 ?>
                     <li class="nav-item dropdown" id="navbarAdministrador">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAdministrador" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Administrador
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownAdministrador">
                             <a class="dropdown-item" href="registroPeliculas.php">Insertar película</a>
                             <a class="dropdown-item" href="#">Administrar préstamos[WIP]</a>
                             <div class="dropdown-divider"></div>
@@ -107,10 +107,10 @@ session_start();
                 if (isset($_SESSION["datosUsuario"])) {
                 ?><ul class="navbar-nav mr-auto">
                         <li class="nav-item dropdown ">
-                            <a class="nav-link btn-lg dropdown-toggle " href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a class="nav-link btn-lg dropdown-toggle " href="#" id="navbarUsuario" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <?php echo $_SESSION["datosUsuario"]["userId"]; ?>
                             </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <div class="dropdown-menu" aria-labelledby="navbarUsuario">
                                 <a class="dropdown-item" id="aniadirFondos" href="" data-target="#modalRegistro">Añadir fondos</a>
                                 <a class="dropdown-item" id="misPrestamos" href="verCompras.php">Mis préstamos</a>
                                 <a class="dropdown-item" id="cerrarSesion" href="">Cerrar sesión</a>
