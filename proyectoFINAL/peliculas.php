@@ -1,27 +1,27 @@
 <div id="noStock" class="alert alert-danger alert-dismissible fade show" role="alert">
-  <strong>¡Holy guacamoly!</strong> Parece que no hay existencias de esa película ahora mismo, contacta con un administrador.
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
+    <strong>¡No hay existencias!</strong> Parece que no hay existencias de esa película ahora mismo, contacta con un administrador.
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
 </div>
 
 <div id="masAlquiler" class="alert alert-danger alert-dismissible fade show" role="alert">
-  <strong>¡Holy guacamoly!</strong> Ya tienes una película en alquiler. Por favor, cumple tu plazo o devuelve la anterior para alquilar una nueva.
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
+    <strong>¡Holy guacamoly!</strong> Ya tienes una película en alquiler. Por favor, cumple tu plazo o devuelve la anterior para alquilar una nueva.
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
 </div>
 <div id="noDinero" class="alert alert-warning alert-dismissible fade show" role="alert">
-  <strong>¡Holy guacamoly!</strong> ¡No hay dinero suficiente, añade algo más!
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
+    <strong>¡Holy guacamoly!</strong> ¡No hay dinero suficiente, añade algo más!
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
 </div>
 <div id="siDinero" class="alert alert-success alert-dismissible fade show" role="alert">
-  <strong>¡Holy guacamoly!</strong> ¡Enhorabuena, has adquirido un nuevo producto!
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
+    <strong>¡Holy guacamoly!</strong> ¡Enhorabuena, has adquirido un nuevo producto!
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
 </div>
 <form class="bd-search position-relative me-auto">
     <span class="algolia-autocomplete" style="position: relative; display: inline-block; direction: ltr;">
@@ -67,7 +67,7 @@
                 insertarCartas(misPeliculas);
             } else {
                 //Filtramos la busqueda por lo que haya en la barra de navegación, creando de forma dinámica los elementos.
-                for (let indice = 0; indice < misPeliculas.length; indice++ && $("#contenedorCartas").html()=="") {
+                for (let indice = 0; indice < misPeliculas.length; indice++ && $("#contenedorCartas").html() == "") {
                     if (misPeliculas[indice].nom_pelicula.search(miBusqueda) != -1) {
                         insertarCartaIndividual(misPeliculas, miBusqueda);
                     } else {
@@ -84,104 +84,111 @@
         $target = $(e.target);
         if ($target.data('id') != undefined) {
             //Comprobamos si el usuario ha iniciado sesión. Si no lo ha hecho, se le indicará que debe hacerlo para poder comprar/alquilar.
-            <?php if (isset($_SESSION["datosUsuario"])){ ?>
+            <?php if (isset($_SESSION["datosUsuario"])) { ?>
 
-                let comprar_alquilar="";
+                let comprar_alquilar = "";
                 let noAlquila = false;
-                if($target.data('comprar') != undefined){
-                    comprar_alquilar="compra";
+                if ($target.data('comprar') != undefined) {
+                    comprar_alquilar = "compra";
+                    realizarVenta($target, comprar_alquilar);
                 }
-                if($target.data('alquilar') != undefined){
-                    comprar_alquilar="alquiler"
-                    
+                if ($target.data('alquilar') != undefined) {
+                    comprar_alquilar = "alquiler";
                     //Hemos de comprobar si el usuario tiene una película alquilada. Si es así, no podrá alquilar nada.
                     let comprobarAlquileres = new Object();
                     comprobarAlquileres.valor = "mostrarVentas";
                     comprobarAlquileres.usuario = "<?php echo $_SESSION["datosUsuario"]["userId"] ?>";
-                    ajax("php/manejadorDB.php", "POST", comprobarAlquileres, function(e){
+                    ajax("php/manejadorDB.php", "POST", comprobarAlquileres, function(e) {
                         let arrayAlquileres = JSON.parse(e);
-
                         for (let indice = 0; indice < arrayAlquileres.length; indice++) {
-                               if(arrayAlquileres[indice].devuelto=="No" && arrayAlquileres[indice].tipo=="alquiler"){
-
+                            if (arrayAlquileres[indice].devuelto == "No" && arrayAlquileres[indice].tipo == "alquiler") {
                                 noAlquila = true;
-                               }   
-                               else{
-                                
-                               }
+                            } else {
+
+                            }
                         }
                         //Comprobamos si se dio el caso.
-                        /* if(noAlquila==true){
-                                console.log("Definitivamente no alquila");
-                                }
-                                else{
-                                console.log("Definitivamente alquila");
-                                } */
-
-                    });                  
-                }
-                console.log(noAlquila);
-                let peliculaAccion = new Object();
-                peliculaAccion.valor = "unaPelicula";
-                peliculaAccion.id = $target.data('id');
-
-                ajax("php/manejadorDB.php", "POST", peliculaAccion, function(e) {
-                    let peliculaObtenida = JSON.parse(e);
-
-                     //Una vez comprobado, comprobamos si hay stock de la pelicula en cuestión. Si la hay, se ejecutará la acción, si no, se avisará al usuario.
-                     $stockDisponible = peliculaObtenida[0].cantidad_disponible;
-                     if($stockDisponible >=1){
-                          //Creamos un objeto venta, se lo pasamos al servidor, ejecutará la venta y se registrará en la base de datos.
-                        let miVenta = new Object();
-                        miVenta.valor="vender";
-                        miVenta.nom_pelicula=peliculaObtenida[0].nom_pelicula;
-                        miVenta.tipo=comprar_alquilar;
-                        miVenta.precio=peliculaObtenida[0].precio;
-                        ajax("php/manejadorDB.php", "POST", miVenta, function(e){
-                            if(e=="No hay dinero"){
-                                $("#noDinero").fadeIn("slow");
-                                setTimeout(function(){
-                                        $("#noDinero").fadeOut("slow");
-                                    }, 5000);
+                        if (noAlquila == true) {
+                            $("#masAlquiler").fadeIn("slow");
+                            setTimeout(function() {
+                                $("#noDinero").fadeOut("slow");
+                            }, 5000);
+                        } else {
+                            realizarVenta($target, comprar_alquilar);
                         }
-                        else{
+
+
+                    });
+                }
+
+            <?php } else { ?>
+                alert("Debes iniciar sesión antes de poder comprar/alquilar algo.");
+            <?php } ?>
+
+
+        }
+    });
+
+    function realizarVenta($target, comprar_alquilar) {
+        <?php if (isset($_SESSION["datosUsuario"])) { ?>
+            let peliculaAccion = new Object();
+            peliculaAccion.valor = "unaPelicula";
+            peliculaAccion.id = $target.data('id');
+
+            ajax("php/manejadorDB.php", "POST", peliculaAccion, function(e) {
+                let peliculaObtenida = JSON.parse(e);
+
+                //Una vez comprobado, comprobamos si hay stock de la pelicula en cuestión. Si la hay, se ejecutará la acción, si no, se avisará al usuario.
+                $stockDisponible = peliculaObtenida[0].cantidad_disponible;
+                if ($stockDisponible >= 1) {
+                    //Creamos un objeto venta, se lo pasamos al servidor, ejecutará la venta y se registrará en la base de datos.
+                    let miVenta = new Object();
+                    miVenta.valor = "vender";
+                    miVenta.nom_pelicula = peliculaObtenida[0].nom_pelicula;
+                    miVenta.tipo = comprar_alquilar;
+                    miVenta.precio = peliculaObtenida[0].precio;
+                    ajax("php/manejadorDB.php", "POST", miVenta, function(e) {
+                        if (e == "No hay dinero") {
+                            $("#noDinero").fadeIn("slow");
+                            setTimeout(function() {
+                                $("#noDinero").fadeOut("slow");
+                            }, 5000);
+                        } else {
                             //Actualizamos el navbar
-                            $("#saldo").html("<?php echo 'Tu saldo: '.$_SESSION["datosUsuario"]["cartera"].'€' ?>");
-                            
+                            $("#saldo").html("<?php echo 'Tu saldo: ' . $_SESSION["datosUsuario"]["cartera"] . '€' ?>");
+
                             $("#siDinero").fadeIn("slow");
-                            setTimeout(function(){
-                                        $("#siDinero").fadeOut("slow");
-                                    }, 5000);                          
+                            setTimeout(function() {
+                                $("#siDinero").fadeOut("slow");
+                            }, 5000);
                         }
                     });
-                     }
-                     else{
-                        $("#noStock").fadeIn("slow");
-                                setTimeout(function(){
-                                        $("#noStock").fadeOut("slow");
-                                    }, 5000);
-                     }
-                });
-            <?php } 
-            else{ ?>
-                alert("Debes iniciar sesión antes de poder comprar/alquilar algo.");
-           <?php } ?>
-         } 
-    });
+                } else {
+                    $("#noStock").fadeIn("slow");
+                    setTimeout(function() {
+                        $("#noStock").fadeOut("slow");
+                    }, 5000);
+                }
+            });
+        <?php } ?>
+    }
 
     function insertarCartas(misPeliculas) {
         for (let indice = 0; indice < misPeliculas.length; indice++) {
             $("#contenedorCartas").append(`<div class="col">
-                        <div class="card" id="${misPeliculas[indice].nom_pelicula}">
-                            <img src="${misPeliculas[indice].imagen}" class="card-img-top" alt="${misPeliculas[indice].nom_pelicula}">
+                        <div class="card carta-peli h-100" id="${misPeliculas[indice].nom_pelicula}">
+                            <img class="img-fluid" src="${misPeliculas[indice].imagen}" class="card-img-top" alt="${misPeliculas[indice].nom_pelicula}">
                             <div class="card-body">
                                 <h5 class="card-title">${misPeliculas[indice].nom_pelicula}</h5>
                                 <p class="card-text">Géneros: ${misPeliculas[indice].genero_principal}, ${misPeliculas[indice].genero_secundario}. Año: ${misPeliculas[indice].anio}</p>
                                 <p class="card-text">${misPeliculas[indice].sinopsis.substring(0, 180).concat('...')}</p>
-                                <p class="card-text">Precio: ${misPeliculas[indice].precio}€</p>
-                                <a href="#" class="btn btn-primary" data-id="${misPeliculas[indice].nom_pelicula}" data-comprar="yes">Comprar película</a>
-                                <a href="#" class="btn btn-primary" data-id="${misPeliculas[indice].nom_pelicula}"data-alquilar="yes">Alquilar película</a>
+                                <p class="card-text">Precio: ${misPeliculas[indice].precio}€. Stock: ${misPeliculas[indice].cantidad_disponible}</p>
                             </div>
+                            <div class="card-footer row">
+                                <a href="#" class="col-5 btn btn-primary" data-id="${misPeliculas[indice].id}" data-comprar="yes">Comprar película</a>
+                                <div class="col-2"></div>
+                                <a href="#" class="col-5 btn btn-primary" data-id="${misPeliculas[indice].id}"data-alquilar="yes">Alquilar película</a>
+                                </div>
                         </div>
                     </div>`);
         }
@@ -190,19 +197,22 @@
     function insertarCartaIndividual(misPeliculas, miBusqueda) {
         console.log(misPeliculas);
         misPeliculas.forEach((elemento, indice) => {
-            
-            if (/* $("#contenedorCartas").find(`#${elemento.nom_pelicula}`) &&  */elemento.nom_pelicula.search(miBusqueda) != -1 || elemento.precio.search(miBusqueda) != -1) {
+
+            if ( /* $("#contenedorCartas").find(`#${elemento.nom_pelicula}`) &&  */ elemento.nom_pelicula.search(miBusqueda) != -1 || elemento.precio.search(miBusqueda) != -1) {
                 $("#contenedorCartas").append(`<div class="col">
-                        <div class="card" id="${elemento.nom_pelicula}">
-                            <img src="${elemento.imagen}" class="card-img-top" alt="${elemento.nom_pelicula}">
+                        <div class="card h-100" id="${misPeliculas[indice].nom_pelicula}">
+                            <img class="img-fluid" src="${misPeliculas[indice].imagen}" class="card-img-top" alt="${misPeliculas[indice].nom_pelicula}">
                             <div class="card-body">
-                                <h5 class="card-title">${elemento.nom_pelicula}</h5>
-                                <p class="card-text">Géneros: ${elemento.genero_principal}, ${elemento.genero_secundario}. Año: ${elemento.anio}</p>
-                                <p class="card-text">${elemento.sinopsis.substring(0, 180).concat('...')}</p>
-                                <p class="card-text">Precio: ${misPeliculas[indice].precio}€</p>
-                                <a href="#" class="btn btn-primary" data-id="${elemento.nom_pelicula}" data-comprar="yes">Comprar película</a>
-                                <a href="#" class="btn btn-primary" data-id="${elemento.nom_pelicula}" data-alquilar="yes">Alquilar película</a>
+                                <h5 class="card-title">${misPeliculas[indice].nom_pelicula}</h5>
+                                <p class="card-text">Géneros: ${misPeliculas[indice].genero_principal}, ${misPeliculas[indice].genero_secundario}. Año: ${misPeliculas[indice].anio}</p>
+                                <p class="card-text">${misPeliculas[indice].sinopsis.substring(0, 180).concat('...')}</p>
+                                <p class="card-text">Precio: ${misPeliculas[indice].precio}€. Stock: ${misPeliculas[indice].cantidad_disponible}</p>
                             </div>
+                            <div class="card-footer row">
+                                <a href="#" class="col-5 btn btn-primary" data-id="${misPeliculas[indice].id}" data-comprar="yes">Comprar película</a>
+                                <div class="col-2"></div>
+                                <a href="#" class="col-5 btn btn-primary" data-id="${misPeliculas[indice].id}"data-alquilar="yes">Alquilar película</a>
+                                </div>
                         </div>
                     </div>`);
             }

@@ -17,16 +17,21 @@ function iniciarSesion($conexion)
     $resultSentencia = $resultado->fetch_all(MYSQLI_ASSOC);
 
     if (password_verify($_POST['password'], $resultSentencia[0]['password'])) {
-        echo "Existe";
-        //Se hace consulta para obtener los datos del usuario, y crear una sesión con ellos.
-        /* echo $resultSentencia[0]["nom_usuario"], $resultSentencia[0]["email"], $resultSentencia[0]["estado"], $resultSentencia[0]["password"], $resultSentencia[0]["id"]; */
-        $valores = [
-            "userId" => $resultSentencia[0]["nom_usuario"],
-            "email" =>  $resultSentencia[0]["email"],
-            "tipo" => $resultSentencia[0]["tipo_usuario"],
-            "cartera" => $resultSentencia[0]["cartera"]
-        ];
-        $_SESSION['datosUsuario'] = $valores;
+        //Comprobamos si el usuario está baneado.
+        if ($resultSentencia[0]["estado"] == 0) {
+            echo "Baneado";
+        } else {
+            echo "Existe";
+            //Se hace consulta para obtener los datos del usuario, y crear una sesión con ellos.
+            $valores = [
+                "userId" => $resultSentencia[0]["nom_usuario"],
+                "numericId" => $resultSentencia[0]["id"],
+                "email" =>  $resultSentencia[0]["email"],
+                "tipo" => $resultSentencia[0]["tipo_usuario"],
+                "cartera" => $resultSentencia[0]["cartera"]
+            ];
+            $_SESSION['datosUsuario'] = $valores;
+        }
     } else {
         echo "No existe";
     }
@@ -48,13 +53,21 @@ function crearUsuario($conexion)
     $sentencia->close();
 }
 
-function eliminarUsuario($conexion){
+function eliminarUsuario($conexion)
+{
     $usuarioEliminado = $_POST['usuario'];
-    $sentencia = $conexion->prepare("DELETE FROM `usuarios` WHERE `usuarios`.`nom_usuario` = ?;");
+    $sentencia = $conexion->prepare("DELETE FROM `usuarios` WHERE `usuarios`.`id` = ?;");
     $sentencia->bind_param('s', $usuarioEliminado);
     $sentencia->execute();
     $sentencia->close();
-    
+}
+
+function obtenerUsuarios($conexion)
+{
+    //Obtenemos todos los géneros disponibles en la base de datos.
+    $sentencia = $conexion->query("SELECT * FROM `usuarios`");
+    $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
+    echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
 }
 
 function comprobarRepetido($conexion)
@@ -71,6 +84,21 @@ function comprobarRepetido($conexion)
         echo "Existe el user";
     } else {
         echo "No existe el user";
+    }
+}
+
+function ban_unbanUsuario($conexion)
+{
+    $id_usuario = $_POST["id_usuario"];
+    $sentencia = $conexion->query("SELECT `estado` FROM `usuarios` WHERE `usuarios`.`id` = $id_usuario;");
+    $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
+    $baneado = $obtenido[0]["estado"];
+
+    if ($baneado == 1) {
+        //Si el usuario no está baneado, se le banea. Si no, viceversa.
+        $conexion->query("UPDATE `usuarios` SET `estado` = 0 WHERE `usuarios`.`id` = $id_usuario;");
+    } else {
+        $conexion->query("UPDATE `usuarios` SET `estado` = 1 WHERE `usuarios`.`id` = $id_usuario;");
     }
 }
 
@@ -109,44 +137,55 @@ function obtenerGeneros($conexion)
 
 function obtenerPeliculas($conexion)
 {
-    $sentencia = $conexion->query("SELECT * FROM `peliculas`");
+    $sentencia = $conexion->query("SELECT * FROM `peliculas` ORDER BY `anio` DESC");
     $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
     echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
 }
 function unaPelicula($conexion)
 {
-    $nombre_peli = $_REQUEST['id'];
-    $sentencia = $conexion->query("SELECT * FROM `peliculas` WHERE nom_pelicula LIKE '$nombre_peli';");
+    $id_peli = $_REQUEST['id'];
+    $sentencia = $conexion->query("SELECT * FROM `peliculas` WHERE `id` LIKE '$id_peli';");
     $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
     echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
 }
 function mostrarVentas($conexion)
 {
     $usuario = $_REQUEST['usuario'];
-    $sentencia = $conexion->query("SELECT * FROM `prestamos` WHERE cliente LIKE '$usuario';");
+    $sentencia = $conexion->query("SELECT * FROM `ventas_alquileres` WHERE cliente LIKE '$usuario' ORDER BY `ventas_alquileres`.`fecha_inicio` DESC;");
+    $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
+    echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
+}
+function mostrarTodasVentas($conexion)
+{
+    $sentencia = $conexion->query("SELECT * FROM `ventas_alquileres` ORDER BY `ventas_alquileres`.`cliente` DESC;");
     $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
     echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
 }
 
 function devolverPelicula($conexion)
 {
+    $usuario = $_SESSION["datosUsuario"]["userId"];
     $id = $_REQUEST['id_prestamo'];
-    $conexion->query("UPDATE `prestamos` SET `devuelto` = 'Si' WHERE `prestamos`.`id_prestamo` = $id;");
+    $conexion->query("UPDATE `ventas_alquileres` SET `devuelto` = 'Si' WHERE `ventas_alquileres`.`id_prestamo` = $id;");
     //Obtenemos el nombre de la pelicula
-    $sentencia = $conexion->query("SELECT pe.`cantidad_disponible`, pe.`nom_pelicula` FROM `peliculas` AS pe INNER JOIN prestamos AS pr ON pe.nom_pelicula = pr.nombre_pelicula WHERE `pr`.`id_prestamo` = $id;");
+    $sentencia = $conexion->query("SELECT pe.`cantidad_disponible`, pe.`nom_pelicula`, pe.`precio` FROM `peliculas` AS pe INNER JOIN ventas_alquileres AS pr ON pe.nom_pelicula = pr.nombre_pelicula WHERE `pr`.`id_prestamo` = $id;");
     $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
-    
     $cantidadPelicula = $obtenido[0]["cantidad_disponible"];
     $nombrePelicula = $obtenido[0]["nom_pelicula"];
-    $nuevaCantidad = $cantidadPelicula+1;
-    echo $nuevaCantidad;
-   //REVISAR ESTA ULTIMA LINEA DE CODIGO
+    $precioPelicula = $obtenido[0]["precio"];
+    $nuevaCantidad = $cantidadPelicula + 1;
     $conexion->query("UPDATE `peliculas` SET `cantidad_disponible` = '$nuevaCantidad' WHERE `nom_pelicula` = '$nombrePelicula';");
+    //Añadimos el saldo al saldo anterior.
+    $conexion->query("UPDATE `usuarios` SET `cartera` = `cartera`+'$precioPelicula' WHERE `usuarios`.`nom_usuario` ='$usuario';");
+    $sentencia2 = $conexion->query("SELECT `cartera` FROM `usuarios` WHERE `usuarios`.`nom_usuario` ='$usuario';");
+    $obtenido2 = $sentencia2->fetch_all(MYSQLI_ASSOC);
+    $new_cartera = $obtenido2[0]["cartera"];
+    $_SESSION["datosUsuario"]["cartera"] = $new_cartera;
 }
 
 function insertarVenta($conexion)
-{   
-    $usuario=$_SESSION["datosUsuario"]["userId"]; 
+{
+    $usuario = $_SESSION["datosUsuario"]["userId"];
     $nombre = $_POST['nom_pelicula'];
     $tipo = $_POST['tipo'];
     $precio = $_POST['precio'];
@@ -157,33 +196,32 @@ function insertarVenta($conexion)
     $sentencia = $conexion->query("SELECT `cartera` FROM `usuarios` WHERE `usuarios`.`nom_usuario` LIKE '$usuario';");
     $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
     $old_cartera = $obtenido[0]["cartera"];
-    $new_cartera= $old_cartera - $precio;
+    $new_cartera = $old_cartera - $precio;
     //Comprobamos si tiene saldo suficiente. Si lo tiene, ejecutará la venta y restará el sueldo, si no, arrojará un aviso al usuario.
-    if($new_cartera>=0){
+    if ($new_cartera >= 0) {
         //Restamos al usuario el dinero de su cartera.
-    $conexion->query("UPDATE `usuarios` SET `cartera` = '$new_cartera' WHERE `usuarios`.`nom_usuario` ='$usuario';");
-    $_SESSION["datosUsuario"]["cartera"]=$new_cartera;
-    $conexion->query("INSERT INTO `prestamos` (`nombre_pelicula`, `cliente`, `tipo`, `fecha_inicio`, `fecha_fin`, `precio`, `devuelto`, `id_prestamo`) VALUES ('$nombre', '$usuario', '$tipo', '$fecha_actual', '$fecha_fin', '$precio', 'No', NULL);");
-    //A continuación, reducimos en 1 el stock de la tienda.
-    $conexion->query("UPDATE `peliculas` SET `cantidad_disponible` = `cantidad_disponible`-1 WHERE `peliculas`.`nom_pelicula` ='$nombre';");
-    }
-    else{
+        $conexion->query("UPDATE `usuarios` SET `cartera` = '$new_cartera' WHERE `usuarios`.`nom_usuario` ='$usuario';");
+        $_SESSION["datosUsuario"]["cartera"] = $new_cartera;
+        $conexion->query("INSERT INTO `ventas_alquileres` (`nombre_pelicula`, `cliente`, `tipo`, `fecha_inicio`, `fecha_fin`, `precio`, `devuelto`, `id_prestamo`) VALUES ('$nombre', '$usuario', '$tipo', '$fecha_actual', '$fecha_fin', '$precio', 'No', NULL);");
+        //A continuación, reducimos en 1 el stock de la tienda.
+        $conexion->query("UPDATE `peliculas` SET `cantidad_disponible` = `cantidad_disponible`-1 WHERE `peliculas`.`nom_pelicula` ='$nombre';");
+    } else {
         echo "No hay dinero";
     }
 }
 
-function ingresarDinero($conexion){
+function ingresarDinero($conexion)
+{
     $ingreso = $_POST['ingreso'];
-    $usuario=$_SESSION["datosUsuario"]["userId"];
+    $usuario = $_SESSION["datosUsuario"]["userId"];
 
     $sentencia = $conexion->query("SELECT `cartera` FROM `usuarios` WHERE `usuarios`.`nom_usuario` LIKE '$usuario';");
     $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
     $old_cartera = $obtenido[0]["cartera"];
-    $new_cartera= $old_cartera + $ingreso;
-    
-    $conexion->query("UPDATE `usuarios` SET `cartera` = '$new_cartera' WHERE `usuarios`.`nom_usuario` = '$usuario';");
-    $_SESSION["datosUsuario"]["cartera"]=$new_cartera;
+    $new_cartera = $old_cartera + $ingreso;
 
+    $conexion->query("UPDATE `usuarios` SET `cartera` = '$new_cartera' WHERE `usuarios`.`nom_usuario` = '$usuario';");
+    $_SESSION["datosUsuario"]["cartera"] = $new_cartera;
 }
 //Realizamos la conexión a la BDD, para poder pasarla por parámetro a las funciones.
 $conect = new Conexion("localhost", "root", "", "bd_videoclub");
@@ -197,8 +235,8 @@ switch ($valor) {
     case 'registroUsuario':
         crearUsuario($conect->dbh);
         break;
-        case 'eliminarUsuario':
-            eliminarUsuario($conect->dbh);
+    case 'eliminarUsuario':
+        eliminarUsuario($conect->dbh);
         break;
     case 'comprobarRepetido':
         comprobarRepetido($conect->dbh);
@@ -218,6 +256,9 @@ switch ($valor) {
     case 'mostrarVentas':
         mostrarVentas($conect->dbh);
         break;
+    case 'todasVentas':
+        mostrarTodasVentas($conect->dbh);
+        break;
     case 'devolver':
         devolverPelicula($conect->dbh);
         break;
@@ -226,6 +267,12 @@ switch ($valor) {
         break;
     case 'ingresarDinero':
         ingresarDinero($conect->dbh);
+        break;
+    case 'mostrarUsuarios':
+        obtenerUsuarios($conect->dbh);
+        break;
+    case 'banear':
+        ban_unbanUsuario($conect->dbh);
         break;
     default:
 

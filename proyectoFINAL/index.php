@@ -1,11 +1,5 @@
 <?php
-
 session_start();
-/* if (isset($_SESSION["datosUsuario"])) {
-    echo $_SESSION["datosUsuario"]["email"] . "<br>";
-    echo $_SESSION["datosUsuario"]["tipo"] . "<br>";
-} */
-
 ?>
 
 <!DOCTYPE html>
@@ -15,43 +9,42 @@ session_start();
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Film's Corner</title>
     <style>
+
+        body::-webkit-scrollbar {
+            display: none; /* Con esto, escondemos las scrollbars, pero siguen funcionando. */
+        }
         body {
-            background-color: black;
+            background-color: darkred !important;
+            background: url('assets/images/cineBG.jpg') no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            background-size: cover;
+            -o-background-size: cover;
         }
 
         #social {
             margin-top: 1em;
         }
 
-        div#carouselExampleIndicators {
-            width: 100%;
-            border: 1px solid black;
-            margin: 0 auto;
-        }
-
-        .carousel-item {
-            width: 100%;
-            height: 700px;
-        }
-
-        .bg-secondary {
-            border-radius: 10px;
-            opacity: 0.7;
-        }
-
-        #izda {
-            border: 1px solid black;
-        }
-
         #dcha {
             border: 1px solid red;
         }
 
-        .card {
-            margin-top: 8% !important;
+        .ticket{
+            margin-top: 2% !important;
+            background: url('assets/images/BGticket.png');
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            background-size: cover;
+            -o-background-size: cover;
+            background-color: rgba(245, 245, 245, 0) !important;
         }
+        .carta-peli{
+            margin-top: 5% !important;
+        }
+
     </style>
 
     <link rel="stylesheet" href="assets/css/login.css">
@@ -62,85 +55,10 @@ session_start();
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Film's Corner</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<div id="header" class=""><?php require_once "maquetacion/header.php" ?> </div>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" id="inicio" href="#">Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#"></a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownExplorar" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Explorar
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdownExplorar">
-                        <a class="dropdown-item" id="verCatalogo" href="#">Ver catálogo</a>
-
-                    </div>
-                </li>
-                <?php if (isset($_SESSION["datosUsuario"]) && $_SESSION["datosUsuario"]["tipo"] == "administrador") {
-                ?>
-                    <li class="nav-item dropdown" id="navbarAdministrador">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAdministrador" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Administrador
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdownAdministrador">
-                            <a class="dropdown-item" href="registroPeliculas.php">Insertar película</a>
-                            <a class="dropdown-item" href="#">Administrar préstamos[WIP]</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Administrar usuarios[WIP]</a>
-                        </div>
-                    </li>
-                <?php
-                }
-                ?>
-            </ul>
-            <form class="form-inline my-2 my-lg-0">
-                <?php
-                if (isset($_SESSION["datosUsuario"])) {
-                ?><ul class="navbar-nav mr-auto">
-                        <li class="nav-item dropdown ">
-                            <a class="nav-link btn-lg dropdown-toggle " href="#" id="navbarUsuario" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <?php echo $_SESSION["datosUsuario"]["userId"]; ?>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarUsuario">
-                                <a class="dropdown-item" id="aniadirFondos" href="" data-target="#modalRegistro">Añadir fondos</a>
-                                <a class="dropdown-item" id="misPrestamos" href="verCompras.php">Mis préstamos</a>
-                                <a class="dropdown-item" id="cerrarSesion" href="">Cerrar sesión</a>
-                                <a class="dropdown-item" id="eliminarCuenta" href="">Eliminar cuenta</a>
-                            </div>
-                        </li>
-                    </ul>
-                <?php
-
-                } else {
-
-                ?><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalInicSesion">
-                        Iniciar Sesión
-                    </button>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalRegistro">
-                        Registrate
-                    </button><?php
-                            }
-                                ?>
-
-            </form>
-        </div>
-        <div id="saldo_navbar"><?php if (isset($_SESSION["datosUsuario"])) {
-            echo '<div id="saldo" class="nav-link">Tu saldo: ' . $_SESSION["datosUsuario"]["cartera"] . '€</div>';
-        } ?></div>
-        
-
-    </nav>
-    <div id="underNAV" class="row">
-        <div id="izda" class="col-2">Ultimas películas</div>
+<div id="underNAV" class="row">
+        <div id="izda" class="col-2 p-3"></div>
         <div id="centro" class="col-8">
             <div id="inicioSlider"><?php require_once "slider.php" ?></div>
             <div id="catalogo"><?php require_once "peliculas.php" ?></div>
@@ -148,325 +66,107 @@ session_start();
         <div id="dcha" class="col-2"></div>
     </div>
 
-
-
-    <div class="modal fade" id="modalInicSesion" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
+    <!-- MODALES -->
+    <div class="modal fade" id="modalVerPeli" tabindex="-1" aria-labelledby="modalVerPeli" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
+                <!-- <div class="modal-header">
+                    
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div> -->
                 <div class="modal-body">
-                    <div id="formu">
-                        <main class="d-flex align-items-center min-vh-100 py-3 py-md-0">
-                            <div class="container">
-                                <div class="card login-card">
-                                    <div class="row no-gutters">
-                                        <div class="col-md-5">
-                                            <img src="assets/images/introVideoclub.jpg" alt="login" class="login-card-img">
-
-                                        </div>
-                                        <div class="col-md-7">
-                                            <div class="card-body">
-                                                <div class="brand-wrapper">
-                                                    <img src="#" alt="Aqui irá el logo cuando lo tenga" class="logo">
-                                                </div>
-                                                <p class="login-card-description">Inicia sesión en tu cuenta</p>
-                                                <form id="formuInicSesion" name="formuInicSesion" action="#!">
-                                                    <div class="form-group">
-                                                        <label for="user" class="sr-only">Usuario/Email</label>
-                                                        <input type="text" name="user" id="user" class="form-control" placeholder="Usuario/email">
-                                                    </div>
-                                                    <div class="form-group mb-4">
-                                                        <label for="password" class="sr-only">Contraseña</label>
-                                                        <input type="password" name="password" id="password" class="form-control" placeholder="***********">
-                                                    </div>
-                                                    <input name="login" id="login" class="btn btn-block login-btn mb-4" type="submit" value="Inicia sesión">
-                                                </form>
-                                                <a href="#!" class="forgot-password-link">¿Has olvidado tu contraseña?</a>
-                                                <p class="login-card-footer-text">¿No tienes cuenta? <a href="" id="inicioToRegistro" class="text-reset">Registrate aquí</a></p>
-                                                <div id="coincidencia" class="alert alert-warning" role="alert">
-                                                    El usuario y la contraseña no coinciden. Por favor, inténtalo de nuevo.
-                                                </div>
-                                                <nav class="login-card-footer-nav">
-                                                    <a href="#!">Terminos de uso.</a>
-                                                    <a href="privacyPolitics.html">Política de privacidad</a>
-                                                </nav>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
+                    <p class="control-label">
+                        <div class="card mb-3">
+                            <div class="row g-0">
+                            <div class="col-md-4">
+                            <img id="imagenPeliculaModal" class="img-fluid img-thumbnail" src="" alt="pelicula">
                             </div>
-                        </main>
-                    </div>
+                            <div class="col-md-8">
+                            <div class="card-body">
+                            <h5 class="modal-title" id="modal-title"></h5>
+                            <h6 class="card-text" id="datosPeliculaModal"></h6>
+                            <h6 class="card-text" id="sinopsisPeliculaModal"></h6>
+                            <h6 class="card-text" id="precioPeliculaModal"></h6>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </p>
                 </div>
-
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success popover-test " id="verMas" data-nombrepeli="test" data-bs-dismiss="modal">Comprar o alquilar</button>
+                </div>
             </div>
         </div>
     </div>
-    <!-- Modal de registro en la web -->
-    <div class="modal fade" id="modalRegistro" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-            <div class="modal-content ">
-                <div class="modal-body">
-                    <form id="formularioRegistro" class="form-horizontal" action='' method="POST">
-                        <fieldset>
-                            <div id="legend">
-                                <legend class="">¡Bienvenido al videoclub!</legend>
-                            </div>
-                            <div class="control-group">
-                                <!-- Username -->
-                                <label class="control-label" for="usernameRegistro">Nombre de usuario</label>
-                                <div class="controls">
-                                    <input type="text" id="usernameRegistro" name="usernameRegistro" placeholder="Pepito123" class="input-xlarge" required>
-                                    <p class="help-block">El usuario puede contener caracteres y números, sin espacios.</p>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <!-- E-mail -->
-                                <label class="control-label" for="emailRegistro">Email</label>
-                                <div class="controls">
-                                    <input type="email" id="emailRegistro" name="emailRegistro" placeholder="pepito123@gmail.com" class="input-xlarge" required>
-                                    <p class="help-block">Por favor, introduce tu email</p>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <!-- Password-->
-                                <label class="control-label" for="passwordRegistro">Contraseña</label>
-                                <div class="controls">
-                                    <input type="password" id="passwordRegistro" name="passwordRegistro" placeholder="***********" class="input-xlarge" required>
-                                    <p class="help-block">La contraseña debe tener al menos 4 caracteres</p>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <!-- Password -->
-                                <label class="control-label" for="password_confirmRegistro">Confirmar contraseña</label>
-                                <div class="controls">
-                                    <input type="password" id="password_confirmRegistro" name="password_confirmRegistro" placeholder="***********" class="input-xlarge" required>
-                                    <p class="help-block">Por favor, confirma tu contraseña</p>
-                                </div>
-                            </div>
-                            <div id="repetidos" class="alert alert-warning" role="alert">
-                                El usuario o el email ya están registrados. Por favor, inténtalo de nuevo.
-                            </div>
-                            <div class="control-group">
-                                <!-- Button -->
-                                <div class="controls">
-                                    <button id="insertarRegistro" class="btn btn-success">Registrate</button>
-                                </div>
-                            </div>
-                        </fieldset>
-                    </form>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-<!-- Modal -->
-<div
-  class="modal fade" id="modalSaldo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Insertar saldo en tu cuenta</h5>
-        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-      <p class="login-card-description">Hola <?php echo $_SESSION["datosUsuario"]["userId"] ?>. Por favor, indica cuanto saldo quieres añadir a tu cuenta (en €).</p>
-      <input type="number" name="saldoInsertar" id="saldoInsertar" class="form-control" placeholder="Ej: 14.95"></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Esta vez no.
-        </button>
-        <button type="button" class="btn btn-primary" id="insertarSaldo">Insertar saldo</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<div
-  class="modal fade" id="modalEliminarCuenta" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">¿Eliminar cuenta?</h5>
-        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-      <p class="control-label"><?php echo $_SESSION["datosUsuario"]["userId"] ?>, ¿estás seguro de querer eliminar tu cuenta?.</p>
-      <p class="control-label">Esta acción es permanente e irreversible, y perderás todo lo asociado a tu cuenta. ¿Estás seguro? Si es así, escribe "Eliminar"</p>
-      <input type="text" name="escribeEliminar" id="escribeEliminar" class="form-control" placeholder='Escribe: Eliminar'></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success" id="noEliminarCuenta" data-bs-dismiss="modal">
-          No quiero borrar mi cuenta.
-        </button>
-        <button type="button" class="btn btn-danger popover-test" id="eliminarCuentaPermanente" data-bs-content="No has escrito Eliminar correctamente. Revísalo." >Sí, eliminar cuenta permanentemente.</button>
-      </div>
-    </div>
-  </div>
-</div>
 </body>
 
+<div id="footer"><?php require_once "maquetacion/footer.php" ?> </div> 
 
-
+</html>
 
 <script>
-    //Escondemos el formulario de primeras
+window.onload = function(){
+     //Hacemos un bucle, mostrando las 4 ultimas peliculas solamente.
 
-    window.addEventListener("load", function(e) {
-        $("#coincidencia").hide();
-        $("#catalogo").hide();
-        $("#repetidos").hide();
-    });
-    window.addEventListener("unload", function(e) {
+     ajax("php/manejadorDB.php", "POST", {valor:"obtenerPeliculas"}, function(e){
+         let arrayPeliculas = JSON.parse(e);
+         for (let indice = 0; indice < 5; indice++) {
+            $("#izda").append(`<div class="card mb-1 shadow-lg p-3 mb-5 rounded ticket">
+            <div class="row g-0">
+            <div class="col-md-4">
+            <img class ="img-fluid img-thumbnail" src="${arrayPeliculas[indice].imagen}" alt="pelicula">
+            </div>
+            <div class="col-md-8">
+             <div class="card-body">
+                <h5 class="card-title text-truncate">${arrayPeliculas[indice].nom_pelicula}</h5>
+                <p class="card-text"> <a href="#" class="btn btn-primary" data-id="${arrayPeliculas[indice].id}">Ver más</a></p>
+                <p class="card-text"><small class="text-muted">Año: ${arrayPeliculas[indice].anio},  ${arrayPeliculas[indice].genero_principal}</small></p>
+            </div>
+            </div>
+        </div>
+        </div>`);             
+         }
+     });
 
-    })
+}
 
-    $("#inicSesion").on("click", function(e) {
-        $("#formu").toggle();
-    });
-
-    //Añadimos funcionalidad al formulario. Recogerá los datos, y mediante una llamada AJAX accederá a la base de datos, iniciando así sesión.
-    $("#formuInicSesion").on("submit", function(e) {
+$("#inicio").on("click", function(e) {
         e.preventDefault();
-        //Creamos un objeto datos con todo lo que va a pasarse
-        let datos = new Object;
-        datos.user = $("#user").val();
-        datos.password = $("#password").val();
-        datos.valor = "iniciarSesion";
-        ajax("php/manejadorDB.php", "POST", datos, function(e) {
-
-            if (e == "Existe") {
-                $("#coincidencia").hide();
-                $('#modalInicSesion').modal('hide');
-                location.reload();
-            }
-            if (e == "No existe") {
-                $("#coincidencia").show();
-
-            }
-        });
-        $("#formuInicSesion")[0].reset();
-
-    });
-    $("#formularioRegistro").on("submit", function(evento) {
-        evento.preventDefault();
-
-        //Lo primero es comprobar que todos los campos estén correctamente rellenados. Si es así, recojemos los datos.
-
-        //Si las contraseñas no coinciden, vaciar los campos de contraseñas y pedir que se rellenen de nuevo.
-        if ($("#passwordRegistro").val() != $("#password_confirmRegistro").val()) {
-            console.log("no son iguales");
-            $('input[type="password"]').val('');
-
-        } else {
-
-            //Comprobamos si el usuario o el email ya existen.
-            let usuario = new Object;
-            usuario.user = $("#usernameRegistro").val();
-            usuario.email = $("#emailRegistro").val();
-            usuario.valor = "comprobarRepetido";
-
-            ajax("php/manejadorDB.php", "POST", usuario, function(e) {
-
-                if (e == 'Existe el user') {
-                    $("#repetidos").show();
-                }
-                if (e == 'No existe el user') {
-
-                    let nombre = $("#usernameRegistro").val();
-                    let email = $("#emailRegistro").val();
-                    let password = $("#passwordRegistro").val();
-
-                    //Creamos un objeto y lo enviamos mediante ajax. Con esto, buscaremos crear un nuevo usuario en la base de datos.
-
-                    let nuevoUsuario = new Object;
-                    nuevoUsuario.nombre = nombre;
-                    nuevoUsuario.email = email;
-                    nuevoUsuario.password = password;
-                    nuevoUsuario.valor = 'registroUsuario';
-
-                    ajax("php/manejadorDB.php", "POST", nuevoUsuario, function(e) {
-                        $("#formularioRegistro")[0].reset();
-                    });
-                    $('#modalRegistro').modal('hide');
-                    $("#repetidos").hide();
-                }
-            });
-            //Al acabar, destruimos las variables para que no de errores.
-
-        }
-
-    });
-    $("#cerrarSesion").on("click", function(e) {
-        e.preventDefault();
-        ajax("php/logout.php", "POST", "", function(e) {});
-        location.reload();
-    });
-
-    $("#inicioToRegistro").on("click", function(e){
-        $('#modalInicSesion').modal('hide');   
-    });
-
-    $("#inicio").on("click", function(e) {
         $("#inicioSlider").show();
         $("#catalogo").hide();
     });
     $("#verCatalogo").on("click", function(e) {
+        e.preventDefault();
         $("#inicioSlider").hide();
         $("#catalogo").show();
     });
-    $("#aniadirFondos").on("click", function(e){
-        e.preventDefault();
-        $("#modalSaldo").modal();
-    });
-    $("#insertarSaldo").on("click", function(e){
-        if($("#saldoInsertar").val()==""){
-            console.log("llenalo puto!");
-        }
-        else if($("#saldoInsertar").val().slice(0, 1)=="-"){
-            console.log("negativos no puto!");
-        }
-        else{
-            let insertarSaldo= new Object;
-            insertarSaldo.valor="ingresarDinero";
-            insertarSaldo.ingreso=$("#saldoInsertar").val();
-            ajax("php/manejadorDB.php", "POST", insertarSaldo, function(e){
-            });
-            location.reload();
-        }
-    });
-    $("#eliminarCuenta").on("click", function(e){
-        e.preventDefault();
-        $('#modalEliminarCuenta').modal();
-    });
-    $("#noEliminarCuenta").on("click", function(e){
-        e.preventDefault();
-        $('#modalEliminarCuenta').modal('hide');
-    });
-    $("#eliminarCuentaPermanente").on("click", function(e){
-        if($("#escribeEliminar").val()=="Eliminar"){
-            e.preventDefault();
-            <?php if(isset($_SESSION["datosUsuario"]["userId"])) { ?>
-            let borrarCuenta = new Object();
-            borrarCuenta.valor="eliminarUsuario";
-            borrarCuenta.usuario="<?php echo $_SESSION["datosUsuario"]["userId"] ?>";
-            ajax("php/manejadorDB.php", "POST", borrarCuenta, function(e){
 
-            });
-
-            ajax("php/logout.php", "POST", {}, function(e){
-                location.reload();
-            });
-        <?php } ?> 
-        } 
-        else{
-
-        }
-    });
+$("#izda").on("click", function(e){
+    $target = $(e.target);
+    if($target.data("id")!=undefined){
+        //Cremamos un modal dinámico y lo llamamos.
+        ajax("php/manejadorDB.php", "POST", {valor: "unaPelicula",
+            id: $target.data("id")
+        }, function(e){
+            let miPelicula = JSON.parse(e);
+            $("#modal-title").html(miPelicula[0].nom_pelicula);
+            $("#imagenPeliculaModal").attr("src", miPelicula[0].imagen);
+            $("#datosPeliculaModal").html("<p>Nombre original: "+miPelicula[0].nom_original+".</p><p> Año de publicación: "+miPelicula[0].anio+". </p><p>Géneros: "+miPelicula[0].genero_principal+", "+miPelicula[0].genero_secundario+".</p>");
+            $("#sinopsisPeliculaModal").html("Sinopsis: "+miPelicula[0].sinopsis);
+            $("#precioPeliculaModal").html("Precio: "+miPelicula[0].precio+"€");
+            $("#verMas").data("nombrepeli", miPelicula[0].nom_pelicula);
+            $('#modalVerPeli').modal('toggle');
+        });
+        
+    }
+});
+$("#verMas").on("click", function(e){
+    e.preventDefault();
+    $('#modalVerPeli').modal('toggle');
+    $("#busquedaPelis").val($("#verMas").data("nombrepeli"));
+    $("#busquedaPelis").keyup();
+    $("#verCatalogo").click();
+});
+    
 </script>
-
-</html>
