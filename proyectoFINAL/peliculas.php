@@ -23,6 +23,12 @@
         <span aria-hidden="true">&times;</span>
     </button>
 </div>
+<div id="noInicSesion" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>¡Hey, usuario!</strong> Necesitas haber iniciado sesión antes de comprar o alquilar cualquier cosa.
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
 <form class="bd-search position-relative me-auto">
     <span class="algolia-autocomplete" style="position: relative; display: inline-block; direction: ltr;">
         <input type="search" class="form-control ds-input" id="busquedaPelis" placeholder="Buscar peliculas..." aria-label="Buscar peliculas..." autocomplete="off" data-bd-docs-version="5.0" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-owns="algolia-autocomplete-listbox-0" dir="auto" style="position: relative; vertical-align: top;">
@@ -41,6 +47,7 @@
         $("#siDinero").hide();
         $("#noStock").hide();
         $("#masAlquiler").hide();
+        $("#noInicSesion").hide();
         //Llamamos a Ajax, y obtenemos toda la información de las películas.
 
         ajax("php/manejadorDB.php", "POST", {
@@ -122,7 +129,10 @@
                 }
 
             <?php } else { ?>
-                alert("Debes iniciar sesión antes de poder comprar/alquilar algo.");
+                $("#noInicSesion").fadeIn("slow");
+                setTimeout(function() {
+                    $("#noInicSesion").fadeOut("slow");
+                }, 5000);
             <?php } ?>
 
 
@@ -195,7 +205,6 @@
     }
 
     function insertarCartaIndividual(misPeliculas, miBusqueda) {
-        console.log(misPeliculas);
         misPeliculas.forEach((elemento, indice) => {
 
             if ( /* $("#contenedorCartas").find(`#${elemento.nom_pelicula}`) &&  */ elemento.nom_pelicula.search(miBusqueda) != -1 || elemento.precio.search(miBusqueda) != -1) {

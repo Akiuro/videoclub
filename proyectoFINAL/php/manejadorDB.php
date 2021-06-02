@@ -15,25 +15,29 @@ function iniciarSesion($conexion)
     //Si se ha leido algo, comprobamos las contraseñas.
     $resultado = $sentencia->get_result();
     $resultSentencia = $resultado->fetch_all(MYSQLI_ASSOC);
+    if (isset($resultSentencia[0]['nom_usuario'])) {
 
-    if (password_verify($_POST['password'], $resultSentencia[0]['password'])) {
-        //Comprobamos si el usuario está baneado.
-        if ($resultSentencia[0]["estado"] == 0) {
-            echo "Baneado";
+        if (password_verify($_POST['password'], $resultSentencia[0]['password'])) {
+            //Comprobamos si el usuario está baneado.
+            if ($resultSentencia[0]["estado"] == 0) {
+                echo "Baneado";
+            } else {
+                echo "Existe";
+                //Se hace consulta para obtener los datos del usuario, y crear una sesión con ellos.
+                $valores = [
+                    "userId" => $resultSentencia[0]["nom_usuario"],
+                    "numericId" => $resultSentencia[0]["id"],
+                    "email" =>  $resultSentencia[0]["email"],
+                    "tipo" => $resultSentencia[0]["tipo_usuario"],
+                    "cartera" => $resultSentencia[0]["cartera"]
+                ];
+                $_SESSION['datosUsuario'] = $valores;
+            }
         } else {
-            echo "Existe";
-            //Se hace consulta para obtener los datos del usuario, y crear una sesión con ellos.
-            $valores = [
-                "userId" => $resultSentencia[0]["nom_usuario"],
-                "numericId" => $resultSentencia[0]["id"],
-                "email" =>  $resultSentencia[0]["email"],
-                "tipo" => $resultSentencia[0]["tipo_usuario"],
-                "cartera" => $resultSentencia[0]["cartera"]
-            ];
-            $_SESSION['datosUsuario'] = $valores;
+            echo "No existe";
         }
     } else {
-        echo "No existe";
+        echo "No hay usuario";
     }
 }
 function crearUsuario($conexion)

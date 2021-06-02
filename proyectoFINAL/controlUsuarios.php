@@ -14,7 +14,8 @@
     <script src="assets/js/bootstrap.min.js"></script>
     <style>
         body::-webkit-scrollbar {
-            display: none; /* Con esto, escondemos las scrollbars, pero siguen funcionando. */
+            display: none;
+            /* Con esto, escondemos las scrollbars, pero siguen funcionando. */
         }
     </style>
 </head>
@@ -77,7 +78,7 @@
     }
 
     function crearTablasUsuarios(arrayUsuarios) {
-        console.log(arrayUsuarios);
+
         //Creamos todos los elementos de una tabla, y los añadimos de forma dinámica al html.
         arrayUsuarios.forEach((elemento, indice) => {
 
@@ -108,7 +109,6 @@
         //Añadimos funcionalidad a los botones de banear y de eliminar.
 
         if ($target.data('banear') != undefined) {
-            console.log($target.html());
             if ($target.html() == "Baneado") {
                 //Si el usuario ya está baneado, se le desbaneará.
                 $target.html("Banear");
