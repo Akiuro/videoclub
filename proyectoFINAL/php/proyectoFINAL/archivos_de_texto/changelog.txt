@@ -1,0 +1,12 @@
+17/05/2021.
+
+Se ha modificado el campo usuarios en la base de datos. Ahora incluye el tipo de usuario.
+
+Se ha añadido barra de navegación.
+
+Al iniciar sesión, se crean sesiones en el navegador, lo que hace que ciertos elementos del navbar cambien. (Iniciar/Cerrar sesión.)
+Además, sólo podrás acceder a cierta parte del menú si eres administrador.
+
+Ahora se pueden insertar películas desde el apartado "Insertar pelicula", que se encuentra en la barra de navegación, en el apartado administrador.
+
+Se ha modificado el aspecto del panel social. Aún falta pulirlo un poco más.
