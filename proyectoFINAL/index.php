@@ -46,6 +46,12 @@ session_start();
         .carta-peli {
             margin-top: 5% !important;
         }
+
+        #izdaTitulo {
+            height: 6vh;
+            text-align: center;
+            color: white;
+        }
     </style>
 
     <link rel="stylesheet" href="assets/css/login.css">
@@ -59,12 +65,16 @@ session_start();
     <div id="header" class=""><?php require_once "maquetacion/header.php" ?> </div>
 
     <div id="underNAV" class="row">
-        <div id="izda" class="col-2 p-3"></div>
+        <div id="izda" class="col-3 p-3">
+            <div id="izdaTitulo">
+                <h2>🎟️ Últimos estrenos 🎟️</h2>
+            </div>
+            <div id="izdaBody"></div>
+        </div>
         <div id="centro" class="col-8">
             <div id="inicioSlider"><?php require_once "slider.php" ?></div>
             <div id="catalogo"><?php require_once "peliculas.php" ?></div>
         </div>
-        <div id="dcha" class="col-2"></div>
     </div>
 
     <!-- MODALES -->
@@ -115,8 +125,8 @@ session_start();
         }, function(e) {
             let arrayPeliculas = JSON.parse(e);
             for (let indice = 0; indice < 5; indice++) {
-                $("#izda").append(`<div class="card mb-1 shadow-lg p-3 mb-5 rounded ticket">
-            <div class="row g-0">
+                $("#izdaBody").append(`<div class="card mb-1 shadow-lg p-3 mb-5 w-100 rounded ticket">
+            <div class="row no-gutters g-0">
             <div class="col-md-4">
             <img class ="img-fluid img-thumbnail" src="${arrayPeliculas[indice].imagen}" alt="pelicula">
             </div>

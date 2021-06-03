@@ -29,6 +29,9 @@
         <span aria-hidden="true">&times;</span>
     </button>
 </div>
+<div id="tituloVentanaPelis">
+    <h1 style="color: white; text-align: center; margin: 3%;">🎬 Todas las películas 🎬</h1>
+</div>
 <form class="bd-search position-relative me-auto">
     <span class="algolia-autocomplete" style="position: relative; display: inline-block; direction: ltr;">
         <input type="search" class="form-control ds-input" id="busquedaPelis" placeholder="Buscar peliculas..." aria-label="Buscar peliculas..." autocomplete="off" data-bd-docs-version="5.0" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-owns="algolia-autocomplete-listbox-0" dir="auto" style="position: relative; vertical-align: top;">
@@ -197,7 +200,7 @@
                             <div class="card-footer row">
                                 <a href="#" class="col-5 btn btn-primary" data-id="${misPeliculas[indice].id}" data-comprar="yes">Comprar película</a>
                                 <div class="col-2"></div>
-                                <a href="#" class="col-5 btn btn-primary" data-id="${misPeliculas[indice].id}"data-alquilar="yes">Alquilar película</a>
+                                <a href="#" class="col-5 btn btn-primary" data-id="${misPeliculas[indice].id}"data-alquilar="yes">Alquilar película (80% descuento)</a>
                                 </div>
                         </div>
                     </div>`);

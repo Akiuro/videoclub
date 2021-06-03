@@ -6,7 +6,7 @@ function iniciarSesion($conexion)
 
 
     //Obtenemos los datos del formulario
-    $user = $_POST['user'];
+    $user = $_POST['nombre'];
     //Buscamos en la base de datos. Si el usuario existe, inicia sesión. Si no, avisará al usuario.
     $sentencia = $conexion->prepare("SELECT * FROM usuarios WHERE usuarios.nom_usuario = ? or usuarios.email = ?");
     $sentencia->bind_param('ss', $user, $user);
@@ -172,11 +172,18 @@ function devolverPelicula($conexion)
     $id = $_REQUEST['id_prestamo'];
     $conexion->query("UPDATE `ventas_alquileres` SET `devuelto` = 'Si' WHERE `ventas_alquileres`.`id_prestamo` = $id;");
     //Obtenemos el nombre de la pelicula
-    $sentencia = $conexion->query("SELECT pe.`cantidad_disponible`, pe.`nom_pelicula`, pe.`precio` FROM `peliculas` AS pe INNER JOIN ventas_alquileres AS pr ON pe.nom_pelicula = pr.nombre_pelicula WHERE `pr`.`id_prestamo` = $id;");
+    $sentencia = $conexion->query("SELECT pr.`tipo`, pe.`cantidad_disponible`, pe.`nom_pelicula`, pe.`precio` FROM `peliculas` AS pe INNER JOIN ventas_alquileres AS pr ON pe.nom_pelicula = pr.nombre_pelicula WHERE `pr`.`id_prestamo` = $id;");
     $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
     $cantidadPelicula = $obtenido[0]["cantidad_disponible"];
+    $tipo = $obtenido[0]["tipo"];
     $nombrePelicula = $obtenido[0]["nom_pelicula"];
-    $precioPelicula = $obtenido[0]["precio"];
+    if($tipo =="compra"){
+        $precioPelicula = $obtenido[0]["precio"]; 
+    }
+    else{
+        $precioPelicula = $obtenido[0]["precio"]*0.2;
+    }
+    
     $nuevaCantidad = $cantidadPelicula + 1;
     $conexion->query("UPDATE `peliculas` SET `cantidad_disponible` = '$nuevaCantidad' WHERE `nom_pelicula` = '$nombrePelicula';");
     //Añadimos el saldo al saldo anterior.
@@ -192,7 +199,14 @@ function insertarVenta($conexion)
     $usuario = $_SESSION["datosUsuario"]["userId"];
     $nombre = $_POST['nom_pelicula'];
     $tipo = $_POST['tipo'];
-    $precio = $_POST['precio'];
+
+    if($tipo =="compra"){
+        $precio = $_POST['precio'];  
+    }
+    else{
+        $precio = $_POST['precio']*0.2;
+    }
+    
     $fecha_actual = date("Y-m-d");
     $fecha_final = strtotime("+7 day");
     $fecha_fin = date("Y-m-d", $fecha_final);
@@ -238,6 +252,7 @@ switch ($valor) {
         break;
     case 'registroUsuario':
         crearUsuario($conect->dbh);
+        iniciarSesion($conect->dbh);
         break;
     case 'eliminarUsuario':
         eliminarUsuario($conect->dbh);

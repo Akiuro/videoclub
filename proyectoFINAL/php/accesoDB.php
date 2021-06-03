@@ -26,14 +26,6 @@ function insertarUsuario($conexion)
 
     $sql->close();
 }
-/* 
-function obtenerCliente($conexion)
-{
-    $resultado = $conexion->query("SELECT * FROM `clientes`");
-    $obtenido = $resultado->fetch_all(MYSQLI_ASSOC);
-    echo json_encode($obtenido);
-} */
-
 
 
 $conect = new Conexion("localhost", "root", "", "bd_videoclub");

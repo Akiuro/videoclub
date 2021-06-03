@@ -1,5 +1,3 @@
-
-
 .brand-wrapper {
   margin-bottom: 19px;
 }
@@ -107,8 +105,6 @@ body::-webkit-scrollbar {
   display: none; /* Con esto, escondemos las scrollbars, pero siguen funcionando. */
 }
 body {
-  background-color: darkred !important;
-  background: url('assets/images/cineBG.jpg') no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   background-size: cover;
@@ -123,15 +119,14 @@ body {
   border: 1px solid red;
 }
 
-.ticket{
+.ticket {
   margin-top: 2% !important;
-  background: url('assets/images/BGticket.png');
   -webkit-background-size: cover;
   -moz-background-size: cover;
   background-size: cover;
   -o-background-size: cover;
   background-color: rgba(245, 245, 245, 0) !important;
 }
-.carta-peli{
+.carta-peli {
   margin-top: 5% !important;
 }

@@ -19,21 +19,11 @@
         background: none !important;
         border: none;
         padding: 0 !important;
-        /*optional*/
         font-family: arial, sans-serif;
-        /*input has OS specific font-family*/
         color: #069;
         text-decoration: underline;
         cursor: pointer;
     }
-
-    /* .navbartop{
-    background: url('assets/images/cintaCine.png');
-            -webkit-background-size: cover;
-            -moz-background-size: cover;
-            background-size: cover;
-            -o-background-size: cover;
-} */
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light navbartop">
@@ -50,14 +40,10 @@
             <li class="nav-item">
                 <a class="nav-link" href="#"></a>
             </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownExplorar" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Explorar
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownExplorar">
-                    <a class="dropdown-item" id="verCatalogo" href="#">Ver catálogo</a>
+            <li class="nav-item">
+                <a class="nav-link" id="verCatalogo" href="index.php">Ver catálogo</a>
+            </li>
 
-                </div>
             </li>
             <?php if (isset($_SESSION["datosUsuario"]) && $_SESSION["datosUsuario"]["tipo"] == "administrador") {
             ?>
@@ -67,7 +53,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownAdministrador">
                         <a class="dropdown-item" href="registroPeliculas.php">Insertar película</a>
-                        <a class="dropdown-item" href="controlCompras.php">Administrar préstamos[WIP]</a>
+                        <a class="dropdown-item" href="controlCompras.php">Administrar préstamos</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="controlUsuarios.php">Administrar usuarios</a>
                     </div>
@@ -137,18 +123,15 @@
                                             <form id="formuInicSesion" name="formuInicSesion" action="#!">
                                                 <div class="form-group">
                                                     <label for="user" class="sr-only">Usuario/Email</label>
-                                                    <input type="text" name="user" id="user" class="form-control" placeholder="Usuario/email">
+                                                    <input type="text" name="user" id="user" class="form-control" placeholder="Usuario/email" autocomplete="off">
                                                 </div>
                                                 <div class="form-group mb-4">
                                                     <label for="password" class="sr-only">Contraseña</label>
-                                                    <input type="password" name="password" id="password" class="form-control" placeholder="***********">
+                                                    <input type="password" name="password" id="password" class="form-control" placeholder="***********" >
                                                 </div>
                                                 <input name="login" id="login" class="btn btn-block login-btn mb-4" type="submit" value="Inicia sesión">
                                             </form>
-                                            <a href="#!" class="forgot-password-link">¿Has olvidado tu contraseña?</a>
-                                            <button id="inicioToRegistro" data-bs-target="#modalRegistro" class='text-reset data-bs-toggle="modal" data-bs-dismiss="modal"'>
-                                                <p>Registrate aquí</p>
-                                            </button>
+                                            
                                             <div id="alertasLogIn" style="height: 10vh !important;">
                                                 <div id="coincidencia" class="alert alert-warning" role="alert">
                                                     El usuario y la contraseña no coinciden. Por favor, inténtalo de nuevo.
@@ -160,8 +143,8 @@
                                             </div>
 
                                             <nav class="login-card-footer-nav">
-                                                <a href="#!">Terminos de uso.</a>
-                                                <a href="privacyPolitics.html">Política de privacidad</a>
+                                                <a href="archivos_de_texto/terms.html">Terminos de uso.</a>
+                                                <a href="archivos_de_texto/privacyPolitics.html">Política de privacidad</a>
                                             </nav>
                                         </div>
                                     </div>
@@ -316,7 +299,7 @@
         e.preventDefault();
         //Creamos un objeto datos con todo lo que va a pasarse
         let datos = new Object;
-        datos.user = $("#user").val();
+        datos.nombre = $("#user").val();
         datos.password = $("#password").val();
         datos.valor = "iniciarSesion";
         ajax("php/manejadorDB.php", "POST", datos, function(e) {
@@ -365,7 +348,10 @@
             ajax("php/manejadorDB.php", "POST", usuario, function(e) {
 
                 if (e == 'Existe el user') {
-                    $("#repetidos").show();
+                    $("#repetidos").fadeIn("slow");
+            setTimeout(function() {
+                $("#repetidos").fadeOut("slow");
+            }, 5000);
                 }
                 if (e == 'No existe el user') {
 
@@ -382,7 +368,7 @@
                     nuevoUsuario.valor = 'registroUsuario';
 
                     ajax("php/manejadorDB.php", "POST", nuevoUsuario, function(e) {
-                        $("#formularioRegistro")[0].reset();
+                        location.reload();
                     });
                     $('#modalRegistro').modal('hide');
                     $("#repetidos").hide();
