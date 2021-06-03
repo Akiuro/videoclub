@@ -1,0 +1,5 @@
+Hacer pestaña de préstamos individual para cada usuario.
+
+Apartado en el lado izquierdo de últimas películas
+
+Apartado en el lado derecho de últimas reseñas
