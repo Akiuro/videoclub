@@ -38,7 +38,7 @@
     </span>
     </span>
 </form>
-<div id="contenedorCartas" class="row row-cols-1 row-cols-md-4 g-4">
+<div id="contenedorCartas" class="row row-cols-xl-3 row-cols-lg-2 row-cols-md-1 row-cols-sm-1">
 </div>
 
 </body>
@@ -63,30 +63,14 @@
     });
 
     $("#busquedaPelis").keyup(function(e) {
-        let miBusqueda = $("#busquedaPelis").val();
-        //Lo primero es vaciar lo anterior para que no haya errores de duplicidad.
-        $("#contenedorCartas").html("");
-
-
-        ajax("php/manejadorDB.php", "POST", {
-            valor: "obtenerPeliculas"
-        }, function(e) {
-            let misPeliculas = JSON.parse(e);
-            //Ahora comprobamos. Si la barra de busqueda está vacia lo imprime todo, si no, solo lo que está en la barra.
-            if (miBusqueda == "") {
-                insertarCartas(misPeliculas);
-            } else {
-                //Filtramos la busqueda por lo que haya en la barra de navegación, creando de forma dinámica los elementos.
-                for (let indice = 0; indice < misPeliculas.length; indice++ && $("#contenedorCartas").html() == "") {
-                    if (misPeliculas[indice].nom_pelicula.search(miBusqueda) != -1) {
-                        insertarCartaIndividual(misPeliculas, miBusqueda);
-                    } else {
-
-                    }
-                }
-            }
-        });
+        buscarPeliculas();
     });
+    $("#busquedaPelis").on("click", function(e) {
+        setTimeout(function() {
+            buscarPeliculas();
+                            }, 1);
+    });
+
     //Con este manejador, registraremos el click cuando se haga en los elementos de búsqueda.
     //Dependiendo de si se hace en un tipo de botón u otro, sucederán distintas cosas.
 
@@ -185,7 +169,31 @@
             });
         <?php } ?>
     }
+    function buscarPeliculas(){
+        let miBusqueda = $("#busquedaPelis").val();
+        //Lo primero es vaciar lo anterior para que no haya errores de duplicidad.
+        $("#contenedorCartas").html("");
 
+
+        ajax("php/manejadorDB.php", "POST", {
+            valor: "obtenerPeliculas"
+        }, function(e) {
+            let misPeliculas = JSON.parse(e);
+            //Ahora comprobamos. Si la barra de busqueda está vacia lo imprime todo, si no, solo lo que está en la barra.
+            if (miBusqueda == "") {
+                insertarCartas(misPeliculas);
+            } else {
+                //Filtramos la busqueda por lo que haya en la barra de navegación, creando de forma dinámica los elementos.
+                for (let indice = 0; indice < misPeliculas.length; indice++ && $("#contenedorCartas").html() == "") {
+                    if (misPeliculas[indice].nom_pelicula.search(miBusqueda) != -1) {
+                        insertarCartaIndividual(misPeliculas, miBusqueda);
+                    } else {
+
+                    }
+                }
+            }
+        });
+    }
     function insertarCartas(misPeliculas) {
         for (let indice = 0; indice < misPeliculas.length; indice++) {
             $("#contenedorCartas").append(`<div class="col">
@@ -212,7 +220,7 @@
 
             if ( /* $("#contenedorCartas").find(`#${elemento.nom_pelicula}`) &&  */ elemento.nom_pelicula.search(miBusqueda) != -1 || elemento.precio.search(miBusqueda) != -1) {
                 $("#contenedorCartas").append(`<div class="col">
-                        <div class="card h-100" id="${misPeliculas[indice].nom_pelicula}">
+                        <div class="card carta-peli h-100" id="${misPeliculas[indice].nom_pelicula}">
                             <img class="img-fluid" src="${misPeliculas[indice].imagen}" class="card-img-top" alt="${misPeliculas[indice].nom_pelicula}">
                             <div class="card-body">
                                 <h5 class="card-title">${misPeliculas[indice].nom_pelicula}</h5>
@@ -223,7 +231,7 @@
                             <div class="card-footer row">
                                 <a href="#" class="col-5 btn btn-primary" data-id="${misPeliculas[indice].id}" data-comprar="yes">Comprar película</a>
                                 <div class="col-2"></div>
-                                <a href="#" class="col-5 btn btn-primary" data-id="${misPeliculas[indice].id}"data-alquilar="yes">Alquilar película</a>
+                                <a href="#" class="col-5 btn btn-primary" data-id="${misPeliculas[indice].id}"data-alquilar="yes">Alquilar película (80% descuento)</a>
                                 </div>
                         </div>
                     </div>`);

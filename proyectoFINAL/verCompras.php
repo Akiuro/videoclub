@@ -54,8 +54,27 @@ session_start();
     </div>
     <div id="footer" class="fixed-bottom"><?php require_once "maquetacion/footer.php" ?> </div>
 
+                               <!--  MODALES -->
 
-
+        <div class="modal fade" id="modalConfirmarAccion" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">¿Devolver alquiler?</h5>
+                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="control-label">¿Deseas devolver tu alquiler antes de tiempo?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" id="noDevolver" data-bs-dismiss="modal">
+                            Esta vez no.
+                        </button>
+                        <button type="button" class="btn btn-danger popover-test" id="devolverPermanente" data-borrar="test"> Sí, devolver.</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 </body>
 <script>
@@ -79,12 +98,23 @@ session_start();
                 let fecha_fin = "";
                 let disabled = "";
                 let devolver = "Devolver";
+                let anio; 
+                let mes; 
+                let dia;
                 ventas.forEach((elemento, indice) => {
+                    //Formateamos la fecha de compra, y comprobamos si es necesario hacer lo mismo para la de fin.
+                    anio = elemento.fecha_inicio.substr(0, 4);
+                    mes = elemento.fecha_inicio.substr(5, 2);
+                    dia = elemento.fecha_inicio.substr(8, 2);
+                    fecha_inicio = dia+"/"+mes+"/"+anio;
                     //Este if comprueba si es una compra o un alquiler. Dependiendo del caso, mostrará fecha o no.
                     if (elemento.tipo == "compra") {
                         fecha_fin = "No hay fecha límite";
                     } else {
-                        fecha_fin = elemento.fecha_fin;
+                        anio = elemento.fecha_fin.substr(0, 4);
+                        mes = elemento.fecha_fin.substr(5, 2);
+                        dia = elemento.fecha_fin.substr(8, 2);
+                        fecha_fin = dia+"/"+mes+"/"+anio;
                     }
                     //Este if comprobará si el elemento ya está devuelto. Si lo está, deshabilitará el botón.
                     if (elemento.devuelto == "Si") {
@@ -94,12 +124,15 @@ session_start();
                         disabled = "";
                         devolver = "Devolver";
                     }
+
+                     
+                                        
                     $("#comprasPeliculas").append(`
                         <tr>
                             <th scope="row">${elemento.nombre_pelicula}</th>
                             <td>${elemento.tipo}</td>
                             <td>${elemento.precio}€</td>
-                            <td>${elemento.fecha_inicio}</td>
+                            <td>${fecha_inicio}</td>
                             <td>${fecha_fin}</td>
                             <td><button data-devolver="${elemento.id_prestamo}" ${disabled} class="btn btn-dark">${devolver}</button></td>
                         </tr>`);
@@ -111,26 +144,27 @@ session_start();
     });
 
     $(document).ready(function() {
-        $('#comprasPeliculas').DataTable();
-        $('.dataTables_length').addClass('bs-select');
+        
     });
-
+    $("#noDevolver").on("click", function(e){
+        $("#comprasPeliculas").modal('hide');
+    });
+    $("#devolverPermanente").on("click", function(e){
+        let datosDevolucion = new Object;
+            datosDevolucion.valor = "devolver";
+            datosDevolucion.id_prestamo = $("#devolverPermanente").data("id_prestamo");
+            //Hacemos la devolución por ajax.
+            ajax("php/manejadorDB.php", "POST", datosDevolucion, function(e) {
+                location.reload();
+            });
+    });
 
     //Para cuando se haga click en devolver, controlamos dónde se ha hecho click, y actualizamos.
     $("#comprasPeliculas").on("click", function(e) {
         $target = $(e.target);
         if ($target.data('devolver') != undefined) {
-
-            let datosDevolucion = new Object;
-            datosDevolucion.valor = "devolver";
-            datosDevolucion.id_prestamo = $target.data('devolver');
-            //Hacemos la devolución por ajax.
-            ajax("php/manejadorDB.php", "POST", datosDevolucion, function(e) {
-                //Deshabilitamos el botón para que no pueda devolverse algo de nuevo.
-                $target.attr('disabled', 'disabled');
-                $target.html("Devuelto");
-                location.reload();
-            });
+            $("#devolverPermanente").data("id_prestamo", $target.data('devolver'));
+            $("#modalConfirmarAccion").modal('show');          
         }
     });
 </script>

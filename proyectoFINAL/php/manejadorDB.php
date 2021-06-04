@@ -177,13 +177,7 @@ function devolverPelicula($conexion)
     $cantidadPelicula = $obtenido[0]["cantidad_disponible"];
     $tipo = $obtenido[0]["tipo"];
     $nombrePelicula = $obtenido[0]["nom_pelicula"];
-    if($tipo =="compra"){
-        $precioPelicula = $obtenido[0]["precio"]; 
-    }
-    else{
-        $precioPelicula = $obtenido[0]["precio"]*0.2;
-    }
-    
+    $precioPelicula = $obtenido[0]["precio"]*0.2;
     $nuevaCantidad = $cantidadPelicula + 1;
     $conexion->query("UPDATE `peliculas` SET `cantidad_disponible` = '$nuevaCantidad' WHERE `nom_pelicula` = '$nombrePelicula';");
     //Añadimos el saldo al saldo anterior.
@@ -199,12 +193,15 @@ function insertarVenta($conexion)
     $usuario = $_SESSION["datosUsuario"]["userId"];
     $nombre = $_POST['nom_pelicula'];
     $tipo = $_POST['tipo'];
+    
 
     if($tipo =="compra"){
-        $precio = $_POST['precio'];  
+        $precio = $_POST['precio'];
+        $devuelto = "Si";  
     }
     else{
         $precio = $_POST['precio']*0.2;
+        $devuelto = "No";  
     }
     
     $fecha_actual = date("Y-m-d");
@@ -220,7 +217,7 @@ function insertarVenta($conexion)
         //Restamos al usuario el dinero de su cartera.
         $conexion->query("UPDATE `usuarios` SET `cartera` = '$new_cartera' WHERE `usuarios`.`nom_usuario` ='$usuario';");
         $_SESSION["datosUsuario"]["cartera"] = $new_cartera;
-        $conexion->query("INSERT INTO `ventas_alquileres` (`nombre_pelicula`, `cliente`, `tipo`, `fecha_inicio`, `fecha_fin`, `precio`, `devuelto`, `id_prestamo`) VALUES ('$nombre', '$usuario', '$tipo', '$fecha_actual', '$fecha_fin', '$precio', 'No', NULL);");
+        $conexion->query("INSERT INTO `ventas_alquileres` (`nombre_pelicula`, `cliente`, `tipo`, `fecha_inicio`, `fecha_fin`, `precio`, `devuelto`, `id_prestamo`) VALUES ('$nombre', '$usuario', '$tipo', '$fecha_actual', '$fecha_fin', '$precio', '$devuelto', NULL);");
         //A continuación, reducimos en 1 el stock de la tienda.
         $conexion->query("UPDATE `peliculas` SET `cantidad_disponible` = `cantidad_disponible`-1 WHERE `peliculas`.`nom_pelicula` ='$nombre';");
     } else {
