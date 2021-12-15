@@ -14,7 +14,11 @@
         border-radius: 10px;
         opacity: 0.7;
     }
-
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
     button#inicioToRegistro {
         background: none !important;
         border: none;
@@ -26,7 +30,7 @@
     }
 </style>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light navbartop">
+<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light navbartop">
     <a class="navbar-brand" href="#"> &#127871 Film's Corner &#127871</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -53,7 +57,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownAdministrador">
                         <a class="dropdown-item" href="registroPeliculas.php">Insertar película</a>
-                        <a class="dropdown-item" href="controlCompras.php">Administrar préstamos</a>
+                        <a class="dropdown-item" href="controlCompras.php">Historial de préstamos</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="controlUsuarios.php">Administrar usuarios</a>
                     </div>
@@ -236,15 +240,57 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Insertar saldo en tu cuenta</h5>
+                <h5 class="modal-title">1. Introduzca sus credenciales para el pago.</h5>
                 <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p class="login-card-description">Hola <?php echo $_SESSION["datosUsuario"]["userId"] ?>. Por favor, indica cuanto saldo quieres añadir a tu cuenta (en €).</p>
-                <input type="number" name="saldoInsertar" id="saldoInsertar" class="form-control" placeholder="Ej: 14.95">
+                <p class="login-card-description">Hola <?php echo $_SESSION["datosUsuario"]["userId"] ?>. Por favor, especifica tus datos bancarios aquí para recibir saldo de Film's Corner</p>
+                
+                <div class="container p-0">
+                    <div class="card px-4">
+                        <div class="row gx-3">
+                        <div class="col-12">
+                        <div class="d-flex flex-column">
+                            <p class="text mb-1">Titular de la tarjeta</p> <input class="form-control mb-3" name="cardName" id="cardName" type="text" placeholder="Elena Nito">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex flex-column">
+                            <p class="text mb-1">Número de la tarjeta</p> 
+                            <div class="row">
+                            <input class="form-control col-3 mb-3" name="cardNumber1" id="cardNumber1" type="number" placeholder="1234">
+                            <input class="form-control col-3 mb-3" name="cardNumber2" id="cardNumber2" type="text" maxlength="4" placeholder="3456">
+                            <input class="form-control col-3 mb-3" name="cardNumber3" id="cardNumber3" type="text" maxlength="4" placeholder="5678">
+                            <input class="form-control col-3 mb-3" name="cardNumber4" id="cardNumber4" type="text" maxlength="4" placeholder="9012">
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex flex-column">
+                            <p class="text mb-1">Fecha de cad.</p> <input class="form-control mb-3" name="cadDateBank" id="cadDateBank" type="month" placeholder="MM/YYYY">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex flex-column">
+                            <p class="text mb-1">CVC</p> <input class="form-control mb-3 pt-2" name="pwBank" id="pwBank" type="password" placeholder="***">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                    <div class="d-flex flex-column">
+                            <p class="text mb-1">Importe</p> <input type="number" name="saldoInsertar" id="saldoInsertar" class="form-control" placeholder="Ej: 14.95">
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="badCredentialsPayment" class="alert alert-warning" role="alert">
+            Por favor, revisa tus credenciales.
+        </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-secondary" id="cancelarIngreso" data-bs-dismiss="modal">
                     Esta vez no.
                 </button>
                 <button type="button" class="btn btn-primary" id="insertarSaldo">Insertar saldo</button>
@@ -277,22 +323,49 @@
 </div>
 
 <script>
-    //Escondemos el formulario de primeras
-
+    //Escondemos el formulario de primeras                      
     window.addEventListener("load", function(e) {
         $("#coincidencia").hide();
         $("#catalogo").hide();
         $("#repetidos").hide();
         $("#baneado").hide();
         $("#diffPassword").hide();
+        $("#badCredentialsPayment").hide();
     });
     window.addEventListener("unload", function(e) {
 
     })
-
+    //--------------[VALIDACIONES DE CAMPOS]------------------
+    $("#cardNumber1").on("keypress", function(e){
+        if($("#cardNumber1").val().length>=4){
+            e.preventDefault();
+        }
+    });
+    $("#cardNumber2").on("keypress", function(e){
+        if($("#cardNumber2").val().length>=4){
+            e.preventDefault();
+        }
+    });
+    $("#cardNumber3").on("keypress", function(e){
+        if($("#cardNumber3").val().length>=4){
+            e.preventDefault();
+        }
+    });
+    $("#cardNumber4").on("keypress", function(e){
+        if($("#cardNumber4").val().length>=4){
+            e.preventDefault();
+        }
+    });
+    $("#pwBank").on("keypress", function(e){
+        if($("#pwBank").val().length>=3){
+            e.preventDefault();
+        }
+    });
+    
     $("#inicSesion").on("click", function(e) {
         $("#formu").toggle();
     });
+//------------------[FIN VALIDACIONES]------------------------
 
     //Añadimos funcionalidad al formulario. Recogerá los datos, y mediante una llamada AJAX accederá a la base de datos, iniciando así sesión.
     $("#formuInicSesion").on("submit", function(e) {
@@ -384,17 +457,26 @@
         ajax("php/logout.php", "POST", "", function(e) {});
         window.location.replace("index.php");
     });
+    $("#cancelarIngreso").on("click", function(e){
+        $("#modalSaldo").modal('toggle');
+    });
 
     $("#aniadirFondos").on("click", function(e) {
         e.preventDefault();
-        $("#modalSaldo").modal();
+        $("#modalSaldo").modal('toggle');
     });
     $("#insertarSaldo").on("click", function(e) {
-        //Comprobamos posibles inserciones vacías o negativas en el saldo.
-        if ($("#saldoInsertar").val() == "") {
-
+        //Comprobamos posibles inserciones vacías o negativas en el saldo. También comprobamos que todos los campos están rellenos.
+        if ($("#saldoInsertar").val() == "" || $("#pwBank").val() == "" || $("#cardNumber1").val() == "" || $("#cardNumber2").val() == "" || $("#cardNumber3").val() == "" || $("#cardNumber4").val() == "" || $("#cadDateBank").val() == "" || $("#cardName").val() == "") {
+            $("#badCredentialsPayment").fadeIn("slow");
+                setTimeout(function() {
+                    $("#badCredentialsPayment").fadeOut("slow");
+                }, 5000);
         } else if ($("#saldoInsertar").val().slice(0, 1) == "-") {
-
+            $("#badCredentialsPayment").fadeIn("slow");
+                setTimeout(function() {
+                    $("#badCredentialsPayment").fadeOut("slow");
+                }, 5000);
         } else {
             let insertarSaldo = new Object;
             insertarSaldo.valor = "ingresarDinero";

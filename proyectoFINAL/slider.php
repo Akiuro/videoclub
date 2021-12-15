@@ -13,7 +13,7 @@
 <div id="titulo">
   <h1>🎥Novedades en Film's Corner🎥</h1>
 </div>
-<div id="contenedorCarousel" class="carousel slide w-50" data-ride="carousel">
+<div id="contenedorCarousel" class="carousel slide w-75" data-ride="carousel">
     <div id="carouselPeliculas" class="carousel-inner d-flex">
       <div class="carousel-item active">
         <img src="assets\images\films\logofondo.jpg" class="d-block w-100 rounded mx-auto" height="100%" alt="Videoclub">

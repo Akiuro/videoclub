@@ -1,3 +1,4 @@
+
 <div id="noStock" class="alert alert-danger alert-dismissible fade show" role="alert">
     <strong>¡No hay existencias!</strong> Parece que no hay existencias de esa película ahora mismo, contacta con un administrador.
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -153,11 +154,12 @@
                         } else {
                             //Actualizamos el navbar
                             $("#saldo").html("<?php echo 'Tu saldo: ' . $_SESSION["datosUsuario"]["cartera"] . '€' ?>");
-
+                            
                             $("#siDinero").fadeIn("slow");
                             setTimeout(function() {
                                 $("#siDinero").fadeOut("slow");
                             }, 5000);
+                           
                         }
                     });
                 } else {
@@ -195,8 +197,22 @@
         });
     }
     function insertarCartas(misPeliculas) {
+        let vista ="No";
         for (let indice = 0; indice < misPeliculas.length; indice++) {
-            $("#contenedorCartas").append(`<div class="col">
+                    //Para rellenar un campo, lo primero, es obtener si ha visto o no dicha película alguna vez el usuario que está conectado ahora mismo.
+                    ajax("php/manejadorDB.php", "POST", {
+                    valor: "peliculaVista",
+                    pelicula: misPeliculas[indice].nom_pelicula
+                }, function(e) {
+
+                        let miNumero = JSON.parse(e);
+                    if(miNumero.length == 0){
+                        vista = "No";
+                    }
+                    else{
+                        vista = "Si";
+                    }
+                    $("#contenedorCartas").append(`<div class="col">
                         <div class="card carta-peli h-100" id="${misPeliculas[indice].nom_pelicula}">
                             <img class="img-fluid" src="${misPeliculas[indice].imagen}" class="card-img-top" alt="${misPeliculas[indice].nom_pelicula}">
                             <div class="card-body">
@@ -206,20 +222,37 @@
                                 <p class="card-text">Precio: ${misPeliculas[indice].precio}€. Stock: ${misPeliculas[indice].cantidad_disponible}</p>
                             </div>
                             <div class="card-footer row">
+                            <p class="card-text">  ¿He visto esta película? ${vista}</p>
+                                </div>
+                            <div class="card-footer row">
                                 <a href="#" class="col-5 btn btn-primary" data-id="${misPeliculas[indice].id}" data-comprar="yes">Comprar película</a>
                                 <div class="col-2"></div>
                                 <a href="#" class="col-5 btn btn-primary" data-id="${misPeliculas[indice].id}"data-alquilar="yes">Alquilar película (80% descuento)</a>
                                 </div>
                         </div>
                     </div>`);
+                });
+            
         }
     }
 
     function insertarCartaIndividual(misPeliculas, miBusqueda) {
         misPeliculas.forEach((elemento, indice) => {
-
+            let vista ="No";
             if ( /* $("#contenedorCartas").find(`#${elemento.nom_pelicula}`) &&  */ elemento.nom_pelicula.search(miBusqueda) != -1 || elemento.precio.search(miBusqueda) != -1) {
-                $("#contenedorCartas").append(`<div class="col">
+                
+                ajax("php/manejadorDB.php", "POST", {
+                    valor: "peliculaVista",
+                    pelicula: misPeliculas[indice].nom_pelicula
+                }, function(e) {
+                    let miNumero = JSON.parse(e);
+                    if(miNumero.length == 0){
+                        vista = "No";
+                    }
+                    else{
+                        vista = "Si";
+                    }
+                    $("#contenedorCartas").append(`<div class="col">
                         <div class="card carta-peli h-100" id="${misPeliculas[indice].nom_pelicula}">
                             <img class="img-fluid" src="${misPeliculas[indice].imagen}" class="card-img-top" alt="${misPeliculas[indice].nom_pelicula}">
                             <div class="card-body">
@@ -229,12 +262,18 @@
                                 <p class="card-text">Precio: ${misPeliculas[indice].precio}€. Stock: ${misPeliculas[indice].cantidad_disponible}</p>
                             </div>
                             <div class="card-footer row">
+                            <p class="card-text">  ¿He visto esta película? ${vista}</p>
+                                </div>
+                            <div class="card-footer row">
                                 <a href="#" class="col-5 btn btn-primary" data-id="${misPeliculas[indice].id}" data-comprar="yes">Comprar película</a>
                                 <div class="col-2"></div>
                                 <a href="#" class="col-5 btn btn-primary" data-id="${misPeliculas[indice].id}"data-alquilar="yes">Alquilar película (80% descuento)</a>
                                 </div>
                         </div>
                     </div>`);
+                    
+
+                });
             }
         });
     }

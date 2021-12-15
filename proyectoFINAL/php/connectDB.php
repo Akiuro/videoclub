@@ -9,7 +9,7 @@ class Conexion
     {
 
         $conexion =  mysqli_connect($host, $user, $pw, $db);
-
+        mysqli_set_charset($conexion, "utf8");
 
         if (mysqli_error($conexion)) {
             throw new Exception("Error conectando la base de datos", 1);

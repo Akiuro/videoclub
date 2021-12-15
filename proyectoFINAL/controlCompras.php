@@ -2,7 +2,7 @@
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -18,6 +18,9 @@
         body::-webkit-scrollbar {
             display: none;
             /* Con esto, escondemos las scrollbars, pero siguen funcionando. */
+        }
+        #body{
+            padding-top:6vh;
         }
     </style>
 </head>

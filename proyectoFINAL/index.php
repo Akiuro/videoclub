@@ -3,7 +3,7 @@ session_start();
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -52,6 +52,9 @@ session_start();
             text-align: center;
             color: white;
         }
+        #underNAV{
+            padding-top: 9vh;
+        }
     </style>
 
     <link rel="stylesheet" href="assets/css/login.css">
@@ -63,7 +66,6 @@ session_start();
 
 <body>
     <div id="header" class=""><?php require_once "maquetacion/header.php" ?> </div>
-
     <div id="underNAV" class="row">
         <div id="izda" class="col-3 p-3">
             <div id="izdaTitulo">

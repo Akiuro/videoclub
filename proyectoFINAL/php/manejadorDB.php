@@ -145,6 +145,19 @@ function obtenerPeliculas($conexion)
     $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
     echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
 }
+function peliculaVista($conexion){
+    if(isset($_SESSION["datosUsuario"]["userId"])){
+        $usuario = $_SESSION["datosUsuario"]["userId"];
+    }
+    else{
+        $usuario = "none";
+    }
+    $pelicula=$_POST['pelicula'];
+        $sentencia = $conexion->query("SELECT * FROM `ventas_alquileres` WHERE `cliente` LIKE '$usuario' and `nombre_pelicula` like '$pelicula'");
+        $obtenido = $sentencia->fetch_all(MYSQLI_ASSOC);
+        echo json_encode($obtenido, JSON_UNESCAPED_UNICODE);
+    
+}
 function unaPelicula($conexion)
 {
     $id_peli = $_REQUEST['id'];
@@ -290,6 +303,9 @@ switch ($valor) {
     case 'banear':
         ban_unbanUsuario($conect->dbh);
         break;
+        case 'peliculaVista':
+            peliculaVista($conect->dbh);
+            break;
     default:
 
         break;

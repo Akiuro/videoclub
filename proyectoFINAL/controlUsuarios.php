@@ -1,7 +1,7 @@
 <?php session_start();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -45,28 +45,6 @@
                 </table>
             </div>
             <div class="col-1"></div>
-        </div>
-
-        <!-- MODALES -->
-
-        <div class="modal fade" id="modalEliminarCuenta2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">¿Eliminar cuenta?</h5>
-                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="control-label">Esta acción es permanente e irreversible. ¿Realmente deseas eliminar esta cuenta?</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-success" id="noEliminarCuenta" data-bs-dismiss="modal">
-                            Esta vez no.
-                        </button>
-                        <button type="button" class="btn btn-danger popover-test" id="eliminarCuentaPermanente" data-borrar="test"> Sí, eliminar cuenta permanentemente.</button>
-                    </div>
-                </div>
-            </div>
         </div>
 
     </div>
@@ -135,22 +113,20 @@
             }, function(e) {});
         }
         if ($target.data('eliminar') != undefined) {
+            let numeroUsuario = $target.data('eliminar');
+            console.log("test");
             //Añadimos al boton de eliminar el id del usuario, el cual se encuentra en data-eliminar
-            $("#eliminarCuentaPermanente").data("borrar", $target.data('eliminar'));
-            $("#modalEliminarCuenta2").modal();
+            $("#eliminarCuentaPermanente").data("borrar", numeroUsuario);
+            $target = $(e.target);
+            let borrarCuenta = new Object();
+            borrarCuenta.valor = "eliminarUsuario";
+            borrarCuenta.usuario = numeroUsuario;
+            console.log(borrarCuenta);
+            ajax("php/manejadorDB.php", "POST", borrarCuenta, function(e) {
+                location.reload();
+            }); 
 
         }
-    });
-
-    $("#eliminarCuentaPermanente").on("click", function(e) {
-        $target = $(e.target);
-        let borrarCuenta = new Object();
-        borrarCuenta.valor = "eliminarUsuario";
-        borrarCuenta.usuario = $target.data("borrar");
-        ajax("php/manejadorDB.php", "POST", borrarCuenta, function(e) {
-            location.reload();
-        });
-
     });
 </script>
 
